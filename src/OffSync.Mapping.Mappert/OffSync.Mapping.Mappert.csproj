@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MapperBuilders\MappingBuilders.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MappingBuilders.cs</LastGenOutput>
+    </None>
+    <None Update="MappingBuilders.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MappingBuilders.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MapperBuilders\MappingBuilders.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MappingBuilders.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MappingBuilders.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MappingBuilders.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MapperBuilders\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,151 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using System.Linq.Expressions;
+
+using OffSync.Mapping.Mappert.MappingRules;
+
+namespace OffSync.Mapping.Mappert.MapperBuilders
+{
+<#
+    const int fromCount = 3;
+
+    const int toCount = 3;
+#>
+    public partial class MapperBuilder<TSource, TTarget>
+    {
+<#
+    for (int i = 0; i < fromCount; i++)
+    {
+        string froms = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n}"));
+#>
+
+        protected MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> Map<<#= froms #>>(
+<#
+            for (int k = 0; k <= i; k++)
+            {
+#>
+            Expression<Func<TSource, TFrom<#= k + 1 #>>> from<#= k + 1 #><#= k < i ? "," : ")" #>
+<#
+            }
+#>
+        {
+            var mappingRule = AddMappingRule()
+<#
+            for (int k = 0; k <= i; k++)
+            {#>
+                .WithSource(from<#= k + 1 #>)<#= k == i ? ";" : "" #>
+<#
+            }
+#>
+
+            return new MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget>(mappingRule);
+        }
+<#
+    }
+#>
+    }
+
+<#
+
+    for (int i = 0; i < fromCount; i++)
+    {
+        string froms = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n}"));
+
+#>
+    public sealed class MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> :
+        AbstractMappingRuleBuilder
+    {
+        internal MappingRuleBuilderFrom<#= i + 1 #>(
+            MappingRule mappingRule) :
+            base(mappingRule)
+        {
+        }
+<#
+        for (int j = 0; j < toCount; j++)
+        {
+            string tos = string.Join(", ", Enumerable.Range(1, j + 1).Select(n => $"TTo{n}"));
+#>
+
+        public MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> To<<#= tos #>>(
+<#
+            for (int k = 0; k <= j; k++)
+            {
+#>
+            Expression<Func<TTarget, TTo<#= k + 1 #>>> to<#= k + 1 #><#= k < j ? "," : ")" #>
+<#
+            }
+#>
+        {
+            _mappingRule
+<#
+            for (int k = 0; k <= j; k++)
+            {#>
+                .WithTarget(to<#= k + 1 #>)<#= k == j ? ";" : "" #>
+<#
+            }
+#>
+
+            return new MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>>(_mappingRule);
+        }
+<#
+        }
+#>
+    }
+
+<#
+        for (int j = 0; j < toCount; j++)
+        {
+            string tos = string.Join(", ", Enumerable.Range(1, j + 1).Select(n => $"TTo{n}"));
+            string fromParameters = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n} from{n}"));
+#>
+    public class MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> :
+        AbstractMappingRuleBuilder
+    {
+        internal MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #>(
+            MappingRule mappingRule) :
+            base(mappingRule)
+        {
+        }
+<#          if (j == 0)
+            {#>
+        public delegate <#= tos #> BuilderDelegate(<#= fromParameters #>);
+<#
+            }
+            else
+            {#>
+        public delegate (<#= tos #>) BuilderDelegate(<#= fromParameters #>);
+
+        public delegate object[] ArrayBuilderDelegate(<#= fromParameters #>);
+<#
+            }
+#>
+
+        public MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> Using(
+            BuilderDelegate builder)
+        {
+            _mappingRule.WithBuilder(builder);
+
+            return this;
+        }
+
+<#          if (j > 0)
+            {#>
+        public MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> Using(
+            ArrayBuilderDelegate builder)
+        {
+            _mappingRule.WithBuilder(builder);
+
+            return this;
+        }
+<#          }#>
+    }
+
+<#      } // for j
+    } // for i
+#>
+}
