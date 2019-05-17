@@ -5,6 +5,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 using OffSync.Mapping.Mappert.MappingRules;
@@ -16,7 +17,27 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
 
     const int toCount = 3;
 #>
-    public partial class MapperBuilder<TSource, TTarget>
+    public partial interface IMapperBuilder<TSource, TTarget>
+    {
+<#
+    for (int i = 0; i < fromCount; i++)
+    {
+        string froms = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n}"));
+#>
+        MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> Map<<#= froms #>>(
+<#
+            for (int k = 0; k <= i; k++)
+            {
+#>
+            Expression<Func<TSource, TFrom<#= k + 1 #>>> from<#= k + 1 #><#= k < i ? "," : ");" #>
+<#
+            }
+    }
+#>
+    }
+
+    public partial class MapperBuilder<TSource, TTarget> :
+        IMapperBuilder<TSource, TTarget>
     {
 <#
     for (int i = 0; i < fromCount; i++)
@@ -24,7 +45,8 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         string froms = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n}"));
 #>
 
-        protected MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> Map<<#= froms #>>(
+        [ExcludeFromCodeCoverage]
+        MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> IMapperBuilder<TSource, TTarget>.Map<<#= froms #>>(
 <#
             for (int k = 0; k <= i; k++)
             {
@@ -45,8 +67,29 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
 
             return new MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget>(mappingRule);
         }
+
+        [ExcludeFromCodeCoverage]
+        protected MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> Map<<#= froms #>>(
 <#
-    }
+            for (int k = 0; k <= i; k++)
+            {
+#>
+            Expression<Func<TSource, TFrom<#= k + 1 #>>> from<#= k + 1 #><#= k < i ? "," : ")" #>
+<#
+            }
+#>
+            => ((IMapperBuilder<TSource, TTarget>)this).Map(
+<#
+            for (int k = 0; k <= i; k++)
+            {
+#>
+                from<#= k + 1 #><#= k < i ? "," : ");" #>
+<#
+            }
+#>
+
+<#
+    } // for i
 #>
     }
 
@@ -57,6 +100,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         string froms = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n}"));
 
 #>
+    [ExcludeFromCodeCoverage]
     public sealed class MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> :
         AbstractMappingRuleBuilder
     {
@@ -103,6 +147,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             string tos = string.Join(", ", Enumerable.Range(1, j + 1).Select(n => $"TTo{n}"));
             string fromParameters = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n} from{n}"));
 #>
+    [ExcludeFromCodeCoverage]
     public class MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> :
         AbstractMappingRuleBuilder
     {
