@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
 using OffSync.Mapping.Mappert.MappingRules;
@@ -10,11 +11,26 @@ namespace OffSync.Mapping.Mappert
         MapperBuilder<TSource, TTarget>,
         IMapper<TSource, TTarget>
     {
+        protected AbstractMapper()
+        {
+        }
+
+        protected AbstractMapper(
+            Action<IMapperBuilder<TSource, TTarget>> withMappingRules) :
+            base(withMappingRules)
+        {
+        }
+
         protected abstract TTarget CreateTarget();
 
         public TTarget Map(
             TSource source)
         {
+            if (source == null)
+            {
+                return default;
+            }
+
             var mappingRules = GetCheckedMappingRules();
 
             var target = CreateTarget();

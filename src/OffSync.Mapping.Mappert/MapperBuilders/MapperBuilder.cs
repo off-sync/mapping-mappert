@@ -8,6 +8,16 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
 {
     public partial class MapperBuilder<TSource, TTarget>
     {
+        public MapperBuilder()
+        {
+        }
+
+        public MapperBuilder(
+            Action<IMapperBuilder<TSource, TTarget>> withMappingRules)
+        {
+            withMappingRules(this);
+        }
+
         /// <summary>
         /// Stores the mapping rules that are added by calling AddMappingRule.
         /// </summary>
