@@ -11,6 +11,8 @@
         public string Values { get; set; }
 
         public bool Ignored { get; set; }
+
+        public string LookupValue { get; set; }
     }
 
     public class SourceNested

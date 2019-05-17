@@ -28,6 +28,7 @@ namespace OffSync.Mapping.Mappert.Tests
                     Value = "4",
                 },
                 Values = "5,6",
+                LookupValue = "7",
             };
 
             var target = _sut.Map(source);
@@ -55,6 +56,10 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.Value2,
                 Is.EqualTo("6"));
+
+            Assert.That(
+                target.LookupId,
+                Is.EqualTo(7));
         }
     }
 }

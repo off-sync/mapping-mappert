@@ -6,10 +6,21 @@ using OffSync.Mapping.Mappert.MappingRules;
 
 namespace OffSync.Mapping.Mappert.Tests.Common
 {
+    public interface ILookupService
+    {
+        int Lookup(string value);
+    }
+
+    public class ParsingLookupService :
+        ILookupService
+    {
+        public int Lookup(string value) => int.Parse(value);
+    }
+
     public class TestMapper :
         Mapper<SourceModel, TargetModel>
     {
-        public int MyProperty { get; set; }
+        private readonly ILookupService _lookupService = new ParsingLookupService();
 
         public TestMapper()
         {
@@ -23,6 +34,10 @@ namespace OffSync.Mapping.Mappert.Tests.Common
             IgnoreSource(s => s.Ignored);
 
             IgnoreTarget(t => t.Excluded);
+
+            Map(s => s.LookupValue)
+                .To(t => t.LookupId)
+                .Using(_lookupService.Lookup);
         }
 
         public TestMapper(

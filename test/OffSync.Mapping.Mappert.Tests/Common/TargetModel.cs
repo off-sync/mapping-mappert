@@ -13,6 +13,8 @@
         public string Value2 { get; set; }
 
         public bool Excluded { get; set; }
+
+        public int LookupId { get; set; }
     }
 
     public class TargetNested

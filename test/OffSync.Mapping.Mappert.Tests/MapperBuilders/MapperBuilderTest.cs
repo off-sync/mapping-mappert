@@ -22,13 +22,13 @@ namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
 
             Assert.That(
                 mappingRules,
-                Has.Exactly(4).Items);
+                Has.Exactly(5).Items);
 
             mappingRules = _sut.CheckedMappingRules;
 
             Assert.That(
                 mappingRules,
-                Has.Exactly(4).Items);
+                Has.Exactly(5).Items);
         }
     }
 }

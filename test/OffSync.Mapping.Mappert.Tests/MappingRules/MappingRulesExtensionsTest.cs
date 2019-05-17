@@ -28,11 +28,16 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     b.IgnoreSource(s => s.Ignored);
 
                     b.IgnoreTarget(t => t.Excluded);
+
+                    b.Map(s => s.LookupValue)
+                        .To(t => t.LookupId)
+                        .Using(int.Parse);
                 });
 
             var source = new SourceModel()
             {
                 Values = "1,2",
+                LookupValue = "3",
             };
 
             var target = mapper.Map(source);
@@ -70,6 +75,10 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     b.IgnoreSource(s => s.Ignored);
 
                     b.IgnoreTarget(t => t.Excluded);
+
+                    b.Map(s => s.LookupValue)
+                        .To(t => t.LookupId)
+                        .Using(int.Parse);
                 });
 
             var source = new SourceModel()
