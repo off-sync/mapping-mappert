@@ -149,7 +149,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
             if (sourceProperty == null)
             {
-                throw new InvalidOperationException(
+                throw new ArgumentException(
                     $"no source property found named '{targetProperty.Name}'");
             }
 

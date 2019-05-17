@@ -7,6 +7,12 @@
         public string Description { get; set; }
 
         public TargetNested Nested { get; set; }
+
+        public string Value1 { get; set; }
+
+        public string Value2 { get; set; }
+
+        public bool Excluded { get; set; }
     }
 
     public class TargetNested

@@ -9,6 +9,12 @@ namespace OffSync.Mapping.Mappert.Common
         public static PropertyInfo GetPropertyFromExpression(
             LambdaExpression expression)
         {
+            #region Pre-conditions
+            if (expression == null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var memberExpression = expression.Body as MemberExpression;
 
             if (memberExpression == null)
@@ -26,6 +32,7 @@ namespace OffSync.Mapping.Mappert.Common
                     $"expression body must access a property",
                     nameof(expression));
             }
+            #endregion
 
             return propertyInfo;
         }

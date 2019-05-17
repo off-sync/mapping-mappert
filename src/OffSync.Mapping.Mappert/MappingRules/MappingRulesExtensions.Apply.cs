@@ -55,17 +55,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
                 return;
             }
 
-            // multi-valued assignment using Tuple
-            if (value.GetType().IsGenericType &&
-                value.GetType().GetGenericTypeDefinition().Name == $"Tuple`{targetPropertyCount}")
-            {
-                mappingRule.ApplyFromTuple(
-                    target,
-                    value);
-
-                return;
-            }
-
             // multi-valued assignment using object array
             if (value.GetType().IsArray &&
                 ((object[])value).Length == targetPropertyCount)
@@ -92,27 +81,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
             {
                 var item = type
                     .GetField($"Item{i + 1}")
-                    .GetValue(value);
-
-                mappingRule
-                    .TargetProperties[i]
-                    .SetValue(
-                        target,
-                        item);
-            }
-        }
-
-        public static void ApplyFromTuple<TTarget>(
-            this MappingRule mappingRule,
-            TTarget target,
-            object value)
-        {
-            var type = value.GetType();
-
-            for (int i = 0; i < mappingRule.TargetProperties.Count; i++)
-            {
-                var item = type
-                    .GetProperty($"Item{i + 1}")
                     .GetValue(value);
 
                 mappingRule

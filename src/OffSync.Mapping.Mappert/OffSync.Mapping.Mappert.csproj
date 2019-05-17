@@ -1,7 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,10 +18,6 @@
 
   <ItemGroup>
     <None Update="MapperBuilders\MappingBuilders.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>MappingBuilders.cs</LastGenOutput>
-    </None>
-    <None Update="MappingBuilders.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MappingBuilders.cs</LastGenOutput>
     </None>
@@ -29,15 +33,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>MappingBuilders.tt</DependentUpon>
     </Compile>
-    <Compile Update="MappingBuilders.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>MappingBuilders.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="MapperBuilders\" />
   </ItemGroup>
 
 </Project>

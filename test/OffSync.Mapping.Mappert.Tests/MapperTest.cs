@@ -27,6 +27,7 @@ namespace OffSync.Mapping.Mappert.Tests
                     Key = 3,
                     Value = "4",
                 },
+                Values = "5,6",
             };
 
             var target = _sut.Map(source);
@@ -46,6 +47,14 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.Nested.Value,
                 Is.EqualTo("4"));
+
+            Assert.That(
+                target.Value1,
+                Is.EqualTo("5"));
+
+            Assert.That(
+                target.Value2,
+                Is.EqualTo("6"));
         }
     }
 }
