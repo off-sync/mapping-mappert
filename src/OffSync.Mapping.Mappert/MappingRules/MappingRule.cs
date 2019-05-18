@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace OffSync.Mapping.Mappert.MappingRules
@@ -23,6 +24,8 @@ namespace OffSync.Mapping.Mappert.MappingRules
         public IReadOnlyList<Type> TargetTypes => _targetTypes;
 
         public Delegate Builder { get; private set; }
+
+        public FieldInfo[] BuilderValueTupleFields { get; private set; }
 
         public MappingStrategies MappingStrategy { get; private set; } = MappingStrategies.MapToValue;
 
@@ -52,6 +55,20 @@ namespace OffSync.Mapping.Mappert.MappingRules
             Delegate builder)
         {
             Builder = builder;
+
+            var builderType = builder.Method.ReturnType;
+
+            if (builderType.IsGenericType &&
+                builderType.GetGenericTypeDefinition().Name == $"ValueTuple`{_targetProperties.Count}")
+            {
+                // builder returns a value tuple -> build array of field infos for performance
+                BuilderValueTupleFields = Enumerable
+                    .Range(1, _targetProperties.Count)
+                    .Select(i => builderType.GetField($"Item{i}"))
+                    .ToArray();
+            }
+
+            // TODO check if builder return type is supported
 
             return this;
         }

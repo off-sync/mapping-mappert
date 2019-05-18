@@ -43,7 +43,27 @@ namespace OffSync.Mapping.Mappert.MappingRules
             TSource source,
             TTarget target)
         {
-            var value = mappingRule.GetValue(source);
+            object value;
+
+            if (mappingRule.Builder == null)
+            {
+                // get value from single source property
+                value = mappingRule
+                    .SourceProperties[0]
+                    .GetValue(source);
+            }
+            else
+            {
+                // use builder to get value from source properties
+                var froms = mappingRule
+                    .SourceProperties
+                    .Select(pi => pi.GetValue(source))
+                    .ToArray();
+
+                value = mappingRule
+                    .Builder
+                    .DynamicInvoke(froms);
+            }
 
             var targetPropertyCount = mappingRule.TargetProperties.Count;
 
@@ -58,8 +78,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
 
             // multi-valued assignment using ValueTuple
-            if (value.GetType().IsGenericType &&
-                value.GetType().GetGenericTypeDefinition().Name == $"ValueTuple`{targetPropertyCount}")
+            if (mappingRule.BuilderValueTupleFields != null)
             {
                 mappingRule.ApplyFromValueTuple(
                     target,
@@ -81,29 +100,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
             throw new InvalidOperationException(
                 $"invalid builder result: {value.GetType().FullName}");
-        }
-
-        private static object GetValue<TSource>(
-            this MappingRule mappingRule,
-            TSource source)
-        {
-            if (mappingRule.Builder == null)
-            {
-                // get value from single source property
-                return mappingRule
-                    .SourceProperties[0]
-                    .GetValue(source);
-            }
-
-            // use builder to get value from source properties
-            var froms = mappingRule
-                .SourceProperties
-                .Select(pi => pi.GetValue(source))
-                .ToArray();
-
-            return mappingRule
-                .Builder
-                .DynamicInvoke(froms);
         }
 
         private static void ApplyToArray<TSource, TTarget>(
@@ -202,13 +198,11 @@ namespace OffSync.Mapping.Mappert.MappingRules
             TTarget target,
             object value)
         {
-            var type = value.GetType();
-
             for (int i = 0; i < mappingRule.TargetProperties.Count; i++)
             {
-                var item = type
-                    .GetField($"Item{i + 1}")
-                    .GetValue(value);
+                var field = mappingRule.BuilderValueTupleFields[i];
+
+                var item = field.GetValue(value);
 
                 mappingRule
                     .TargetProperties[i]
