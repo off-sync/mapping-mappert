@@ -9,14 +9,13 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
 {
     public partial class MapperBuilder<TSource, TTarget>
     {
-        public MapperBuilder()
-        {
-        }
-
         public MapperBuilder(
-            Action<IMapperBuilder<TSource, TTarget>> withMappingRules)
+            Action<IMapperBuilder<TSource, TTarget>> withMappingRules = null)
         {
-            withMappingRules(this);
+            if (withMappingRules != null)
+            {
+                withMappingRules(this);
+            }
         }
 
         /// <summary>
@@ -28,7 +27,8 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         /// A read-write lock that ensures that the mapping rules are only
         /// checked once.
         /// </summary>
-        private readonly ReaderWriterLockSlim _mappingRulesLock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _mappingRulesLock = new ReaderWriterLockSlim(
+            LockRecursionPolicy.SupportsRecursion);
 
         /// <summary>
         /// Whether the mapping rules have already been checked.
@@ -93,7 +93,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
                 },
                 () =>
                 {
-                    var mappingRule = new MappingRule();
+                    var mappingRule = new MappingRule(_mappingDelegateBuilder);
 
                     _mappingRules.Add(mappingRule);
 
@@ -144,7 +144,9 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         {
             MappingRulesUtil.EnsureNoDuplicateTargetMappings(mappingRules);
 
-            MappingRulesUtil.EnsureAllTargetPropertiesMapped<TSource, TTarget>(mappingRules);
+            MappingRulesUtil.EnsureAllTargetPropertiesMapped<TSource, TTarget>(
+                mappingRules,
+                () => AddMappingRule());
 
             MappingRulesUtil.EnsureAllSourcePropertiesMapped<TSource>(mappingRules);
 

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using OffSync.Mapping.Mappert.Common;
+using OffSync.Mapping.Mappert.Interfaces;
+
 namespace OffSync.Mapping.Mappert.MappingRules
 {
     public sealed class MappingRule
@@ -20,6 +23,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
         public IReadOnlyList<PropertyInfo> TargetProperties => _targetProperties;
 
         private readonly List<Type> _targetTypes = new List<Type>();
+        private readonly IMappingDelegateBuilder _mappingDelegateBuilder;
 
         public IReadOnlyList<Type> TargetTypes => _targetTypes;
 
@@ -28,6 +32,16 @@ namespace OffSync.Mapping.Mappert.MappingRules
         public FieldInfo[] BuilderValueTupleFields { get; private set; }
 
         public MappingStrategies MappingStrategy { get; private set; } = MappingStrategies.MapToValue;
+
+        public MappingRule()
+        {
+        }
+
+        public MappingRule(
+            IMappingDelegateBuilder mappingDelegateBuilder)
+        {
+            _mappingDelegateBuilder = mappingDelegateBuilder;
+        }
 
         public MappingRule WithSource(
             PropertyInfo sourceProperty,
@@ -56,19 +70,23 @@ namespace OffSync.Mapping.Mappert.MappingRules
         {
             Builder = builder;
 
-            var builderType = builder.Method.ReturnType;
-
-            if (builderType.IsGenericType &&
-                builderType.GetGenericTypeDefinition().Name == $"ValueTuple`{_targetProperties.Count}")
+            if (MappingStrategy == MappingStrategies.MapToValue) // FIXME support all strategies
             {
-                // builder returns a value tuple -> build array of field infos for performance
-                BuilderValueTupleFields = Enumerable
-                    .Range(1, _targetProperties.Count)
-                    .Select(i => builderType.GetField($"Item{i}"))
-                    .ToArray();
-            }
+                var builderType = BuilderUtil.GetBuilderType(
+                    _sourceProperties.ToArray(),
+                    _targetProperties.ToArray(),
+                    builder);
 
-            // TODO check if builder return type is supported
+                if (builderType == BuilderTypes.ValueTuple)
+                {
+                    var returnType = builder.Method.ReturnType;
+
+                    BuilderValueTupleFields = Enumerable
+                        .Range(1, _targetProperties.Count)
+                        .Select(i => returnType.GetField($"Item{i}"))
+                        .ToArray();
+                }
+            }
 
             return this;
         }

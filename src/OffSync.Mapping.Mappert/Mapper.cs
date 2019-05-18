@@ -8,7 +8,8 @@ namespace OffSync.Mapping.Mappert
         AbstractMapper<TSource, TTarget>
         where TTarget : new()
     {
-        public Mapper()
+        public Mapper() :
+            base(null)
         {
         }
 

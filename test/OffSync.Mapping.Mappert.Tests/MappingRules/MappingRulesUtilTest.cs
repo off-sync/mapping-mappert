@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 
+using OffSync.Mapping.Mappert.DynamicMethods;
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Tests.Common;
 
@@ -210,11 +211,15 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         [Test]
         public void CreateAutoMapping()
         {
-            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
-                typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsList)));
+            var mappingDelegateBuilder = new DynamicMethodMappingDelegateBuilder();
 
             MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
-                typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)));
+                typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsList)),
+                () => new MappingRule(mappingDelegateBuilder));
+
+            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
+                typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)),
+                () => new MappingRule(mappingDelegateBuilder));
         }
     }
 }

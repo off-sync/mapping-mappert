@@ -18,7 +18,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         {
             Func<string, object[]> builder = SplitToArray;
 
-            var sut = new MappingRule()
+            var sut = new MappingRule(null)
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
@@ -57,7 +57,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         {
             Func<string, object[]> builder = SplitToArray;
 
-            var sut = new MappingRule()
+            var sut = new MappingRule(null)
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
@@ -82,24 +82,13 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         {
             Func<object, object> builder = o => new object();
 
-            var mappingRule = new MappingRule()
-                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
-                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
-                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Description)))
-                .WithBuilder(builder);
-
-            var source = new SourceModel()
-            {
-                Id = 1,
-            };
-
-            var target = new TargetModel();
-
             Assert.That(
-                () => mappingRule.Apply(
-                    source,
-                    target),
-                Throws.InvalidOperationException);
+                () => new MappingRule(null)
+                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Description)))
+                    .WithBuilder(builder),
+                Throws.ArgumentException);
         }
 
         [Test]
@@ -107,7 +96,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         {
             Func<SourceNested, TargetNested> builder = sn => new TargetNested() { Key = sn.Key, Value = sn.Value };
 
-            var sut = new MappingRule()
+            var sut = new MappingRule(null)
                 .WithSource(
                     typeof(SourceModel).GetProperty(nameof(SourceModel.ItemsEnumerable)),
                     typeof(SourceNested))

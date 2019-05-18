@@ -29,7 +29,8 @@ namespace OffSync.Mapping.Mappert.MappingRules
         }
 
         public static void EnsureAllTargetPropertiesMapped<TSource, TTarget>(
-            ICollection<MappingRule> mappingRules)
+            ICollection<MappingRule> mappingRules,
+            Func<MappingRule> addMappingRule)
         {
             // create lookup of mapped target property names
             var mappedTargetPropertyNames = new HashSet<string>(mappingRules
@@ -51,6 +52,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
                 // not mapped, try to add an auto-mapping
                 if (!TryCreateAutoMapping<TSource>(
                     targetProperty,
+                    addMappingRule,
                     out var mappingRule,
                     out var exception))
                 {
@@ -58,9 +60,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
                         $"unable to create auto-mapping for property '{targetProperty.Name}'",
                         exception);
                 }
-
-                // save auto-mapping rule
-                mappingRules.Add(mappingRule);
             }
         }
 
@@ -221,7 +220,8 @@ namespace OffSync.Mapping.Mappert.MappingRules
         }
 
         public static MappingRule CreateAutoMapping<TSource>(
-            PropertyInfo targetProperty)
+            PropertyInfo targetProperty,
+            Func<MappingRule> addMappingRule)
         {
             // try to get the same-named property from the source type
             var sourceProperty = typeof(TSource)
@@ -236,25 +236,25 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
 
             // create new mapping rule
-            var mappingRule = new MappingRule()
-                .WithSource(sourceProperty)
-                .WithTarget(targetProperty);
-
-            if (targetProperty.PropertyType.IsAssignableFrom(sourceProperty.PropertyType))
-            {
-                // properties have assignable types: no builder required
-                return mappingRule;
-            }
-
             var sourceType = sourceProperty.PropertyType;
 
             var targetType = targetProperty.PropertyType;
+
+            if (targetType.IsAssignableFrom(sourceType))
+            {
+                // properties have assignable types: no builder required
+                return addMappingRule()
+                    .WithSource(sourceProperty)
+                    .WithTarget(targetProperty);
+            }
+
+            MappingRule mappingRule;
 
             // check if both properties have items
             if (sourceType.TryGetSourceItemsType(out var sourceItemsType) &&
                 targetType.TryGetTargetItemsType(out var targetItemsType))
             {
-                mappingRule = new MappingRule()
+                mappingRule = addMappingRule()
                     .WithSource(sourceProperty, sourceItemsType)
                     .WithTarget(targetProperty, targetItemsType)
                     .WithStrategy(targetType.IsArray ?
@@ -271,6 +271,12 @@ namespace OffSync.Mapping.Mappert.MappingRules
                     return mappingRule;
                 }
             }
+            else
+            {
+                mappingRule = addMappingRule()
+                    .WithSource(sourceProperty)
+                    .WithTarget(targetProperty);
+            }
 
             // create auto-mapper
             var mapper = MappersUtil.CreateAutoMapper(
@@ -286,12 +292,15 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
         public static bool TryCreateAutoMapping<TSource>(
             PropertyInfo targetProperty,
+            Func<MappingRule> addMappingRule,
             out MappingRule mappingRule,
             out Exception exception)
         {
             try
             {
-                mappingRule = CreateAutoMapping<TSource>(targetProperty);
+                mappingRule = CreateAutoMapping<TSource>(
+                    targetProperty,
+                    addMappingRule);
 
                 exception = null;
 

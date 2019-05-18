@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using OffSync.Mapping.Mappert.DynamicMethods;
 using OffSync.Mapping.Mappert.MapperBuilders;
 using OffSync.Mapping.Mappert.MappingRules;
 
@@ -24,6 +25,8 @@ namespace OffSync.Mapping.Mappert.Tests.Common
 
         public TestMapper()
         {
+            WithMappingDelegateBuilder(new DynamicMethodMappingDelegateBuilder());
+
             Map(s => s.Name)
                 .To(t => t.Description);
 
