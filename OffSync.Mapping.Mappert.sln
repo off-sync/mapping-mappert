@@ -3,11 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OffSync.Mapping.Mappert", "src\OffSync.Mapping.Mappert\OffSync.Mapping.Mappert.csproj", "{007F4970-6434-48A4-9AE3-444DC8231047}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert", "src\OffSync.Mapping.Mappert\OffSync.Mapping.Mappert.csproj", "{007F4970-6434-48A4-9AE3-444DC8231047}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Practises", "..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj", "{5B804CEC-F8F2-4CB3-80A1-AA57EBB0E447}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OffSync.Mapping.Mappert.Tests", "test\OffSync.Mapping.Mappert.Tests\OffSync.Mapping.Mappert.Tests.csproj", "{DE9B29BB-98DA-472C-BF28-507C7306B1DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Tests", "test\OffSync.Mapping.Mappert.Tests\OffSync.Mapping.Mappert.Tests.csproj", "{DE9B29BB-98DA-472C-BF28-507C7306B1DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Benchmarks", "test\OffSync.Mapping.Mappert.Benchmarks\OffSync.Mapping.Mappert.Benchmarks.csproj", "{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{10E4277B-E0F4-446C-B154-E381BD352177}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1C6AD248-DD37-4165-BC4F-496E25E0AE4F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3AA00142-733E-4016-A2AD-3057F2AD3401}"
+	ProjectSection(SolutionItems) = preProject
+		docs\benchmarks.md = docs\benchmarks.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +38,18 @@ Global
 		{DE9B29BB-98DA-472C-BF28-507C7306B1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE9B29BB-98DA-472C-BF28-507C7306B1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE9B29BB-98DA-472C-BF28-507C7306B1DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{007F4970-6434-48A4-9AE3-444DC8231047} = {10E4277B-E0F4-446C-B154-E381BD352177}
+		{DE9B29BB-98DA-472C-BF28-507C7306B1DD} = {1C6AD248-DD37-4165-BC4F-496E25E0AE4F}
+		{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8} = {1C6AD248-DD37-4165-BC4F-496E25E0AE4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {16CDB210-3587-4434-BB80-E271C75A3C81}
