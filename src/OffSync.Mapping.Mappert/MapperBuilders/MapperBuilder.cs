@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 using OffSync.Mapping.Mappert.MappingRules;
@@ -33,6 +34,8 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         /// Whether the mapping rules have already been checked.
         /// </summary>
         private bool _mappingRulesChecked = false;
+
+        private MappingRule[] _checkedMappingRules = null;
 
         /// <summary>
         /// Uses the <see cref="_mappingRulesLock" /> to
@@ -103,17 +106,19 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         /// and sets <see cref="_mappingRulesChecked"/> to true afterwards.
         /// </summary>
         /// <returns></returns>
-        protected IEnumerable<MappingRule> GetCheckedMappingRules()
+        protected MappingRule[] GetCheckedMappingRules()
         {
             return WithMappingRulesCheckedLocked(
-                () => _mappingRules,
+                () => _checkedMappingRules,
                 () =>
                 {
                     CheckMappingRules(_mappingRules);
 
+                    _checkedMappingRules = _mappingRules.ToArray();
+
                     _mappingRulesChecked = true;
 
-                    return _mappingRules;
+                    return _checkedMappingRules;
                 });
         }
 

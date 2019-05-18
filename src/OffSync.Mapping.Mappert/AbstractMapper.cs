@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
 using OffSync.Mapping.Mappert.MappingRules;
@@ -46,11 +45,11 @@ namespace OffSync.Mapping.Mappert
         protected virtual void ApplyMappingRules(
             TSource source,
             TTarget target,
-            IEnumerable<MappingRule> mappingRules)
+            MappingRule[] mappingRules)
         {
-            foreach (var mappingRule in mappingRules)
+            for (int i = 0; i < mappingRules.Length; i++)
             {
-                mappingRule.Apply(
+                mappingRules[i].Apply(
                     source,
                     target);
             }
