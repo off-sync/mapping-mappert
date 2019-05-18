@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 
+using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Tests.Common;
 
 namespace OffSync.Mapping.Mappert.Tests.MappingRules
@@ -22,6 +23,19 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     b.IgnoreSource(s => s.Ignored);
 
                     b.IgnoreTarget(t => t.Excluded);
+
+                    b.Map(s => s.LookupValue)
+                        .To(t => t.LookupId)
+                        .Using(int.Parse);
+
+                    b.MapItems(s => s.ItemsEnumerable)
+                        .To(t => t.ItemsArray);
+
+                    b.MapItems(s => s.ItemsArray)
+                        .To(t => t.ItemsCollection);
+
+                    b.MapItems(s => s.ItemsArray)
+                        .To(t => t.ItemsList);
                 });
 
             Assert.That(
@@ -47,10 +61,18 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
                     b.IgnoreTarget(t => t.Excluded);
 
-
                     b.Map(s => s.LookupValue)
                         .To(t => t.LookupId)
                         .Using(int.Parse);
+
+                    b.MapItems(s => s.ItemsEnumerable)
+                        .To(t => t.ItemsArray);
+
+                    b.MapItems(s => s.ItemsArray)
+                        .To(t => t.ItemsCollection);
+
+                    b.MapItems(s => s.ItemsArray)
+                        .To(t => t.ItemsList);
                 });
 
             Assert.That(
@@ -81,6 +103,15 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     b.Map(s => s.LookupValue)
                         .To(t => t.LookupId)
                         .Using(int.Parse);
+
+                    b.MapItems(s => s.ItemsEnumerable)
+                        .To(t => t.ItemsArray);
+
+                    b.MapItems(s => s.ItemsArray)
+                        .To(t => t.ItemsCollection);
+
+                    b.MapItems(s => s.ItemsArray)
+                        .To(t => t.ItemsList);
                 });
 
             Assert.That(
@@ -89,32 +120,101 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         }
 
         [Test]
-        public void EnsureValidBuilders()
+        public void EnsureValidBuildersCreatesAutoMappingsForMissingBuilders()
         {
-            var builder = new TestMapper(
-                b =>
-                {
-                    // 'Values' -> 'Value1', 'Value2' mapping is missing a builder
+            var rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Nested)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Nested)));
 
-                    b.Map(s => s.Name)
-                        .To(t => t.Description)
-                        .Using(i => i.ToString());
-
-                    b.Map(s => s.Values)
-                        .To(t => t.Value1, t => t.Value2);
-
-                    b.IgnoreSource(s => s.Ignored);
-
-                    b.IgnoreTarget(t => t.Excluded);
-
-                    b.Map(s => s.LookupValue)
-                        .To(t => t.LookupId)
-                        .Using(int.Parse);
-                });
+            MappingRulesUtil.EnsureValidBuilders(rule.Yield());
 
             Assert.That(
-                () => builder.CheckedMappingRules,
+                rule.Builder,
+                Is.Not.Null);
+
+            rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Description)));
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),
                 Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void EnsureValidBuildersChecksBuildersForMultiPropertyMappings()
+        {
+            var rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)));
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),
+                Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void EnsureValidItemsMappings()
+        {
+            // check for single source properties
+            var rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Name)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
+                .WithStrategy(MappingStrategies.MapToArray);
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
+                Throws.InvalidOperationException);
+
+            // check for single target properties
+            rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
+                .WithStrategy(MappingStrategies.MapToArray);
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
+                Throws.InvalidOperationException);
+
+            // check for source property items type
+            rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
+                .WithStrategy(MappingStrategies.MapToArray);
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
+                Throws.InvalidOperationException);
+
+            // check for target property items type
+            rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.ItemsArray)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
+                .WithStrategy(MappingStrategies.MapToArray);
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
+                Throws.InvalidOperationException);
+        }
+
+        public class CreateAutoMappingModel
+        {
+            public SourceNested[] ItemsList { get; set; }
+
+            public int[] Numbers { get; set; }
+        }
+
+        [Test]
+        public void CreateAutoMapping()
+        {
+            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
+                typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsList)));
+
+            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
+                typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)));
         }
     }
 }

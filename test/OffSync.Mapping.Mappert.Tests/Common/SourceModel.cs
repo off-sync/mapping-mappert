@@ -1,4 +1,6 @@
-﻿namespace OffSync.Mapping.Mappert.Tests.Common
+﻿using System.Collections.Generic;
+
+namespace OffSync.Mapping.Mappert.Tests.Common
 {
     public class SourceModel
     {
@@ -13,6 +15,12 @@
         public bool Ignored { get; set; }
 
         public string LookupValue { get; set; }
+
+        public IEnumerable<SourceNested> ItemsEnumerable { get; set; }
+
+        public SourceNested[] ItemsArray { get; set; }
+
+        public IReadOnlyList<int> Numbers { get; set; }
     }
 
     public class SourceNested

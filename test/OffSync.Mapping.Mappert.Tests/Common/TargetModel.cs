@@ -1,4 +1,6 @@
-﻿namespace OffSync.Mapping.Mappert.Tests.Common
+﻿using System.Collections.Generic;
+
+namespace OffSync.Mapping.Mappert.Tests.Common
 {
     public class TargetModel
     {
@@ -15,6 +17,14 @@
         public bool Excluded { get; set; }
 
         public int LookupId { get; set; }
+
+        public TargetNested[] ItemsArray { get; set; }
+
+        public IList<TargetNested> ItemsCollection { get; set; }
+
+        public List<TargetNested> ItemsList { get; set; }
+
+        public int[] Numbers { get; set; }
     }
 
     public class TargetNested

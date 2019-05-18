@@ -146,6 +146,8 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             MappingRulesUtil.RemoveIgnoringMappingRules(mappingRules);
 
             MappingRulesUtil.EnsureValidBuilders(mappingRules);
+
+            MappingRulesUtil.EnsureValidItemsMappings(mappingRules);
         }
     }
 }

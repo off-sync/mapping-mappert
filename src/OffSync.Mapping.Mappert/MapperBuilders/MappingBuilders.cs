@@ -8,11 +8,14 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
 {
     public partial interface IMapperBuilder<TSource, TTarget>
     {
+
         MappingRuleBuilderFrom1<TFrom1, TTarget> Map<TFrom1>(
             Expression<Func<TSource, TFrom1>> from1);
+
         MappingRuleBuilderFrom2<TFrom1, TFrom2, TTarget> Map<TFrom1, TFrom2>(
             Expression<Func<TSource, TFrom1>> from1,
             Expression<Func<TSource, TFrom2>> from2);
+
         MappingRuleBuilderFrom3<TFrom1, TFrom2, TFrom3, TTarget> Map<TFrom1, TFrom2, TFrom3>(
             Expression<Func<TSource, TFrom1>> from1,
             Expression<Func<TSource, TFrom2>> from2,
@@ -132,7 +135,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom1To1<TFrom1, TTo1> :
+    public sealed class MappingRuleBuilderFrom1To1<TFrom1, TTo1> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom1To1(
@@ -153,7 +156,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom1To2<TFrom1, TTo1, TTo2> :
+    public sealed class MappingRuleBuilderFrom1To2<TFrom1, TTo1, TTo2> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom1To2(
@@ -183,7 +186,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom1To3<TFrom1, TTo1, TTo2, TTo3> :
+    public sealed class MappingRuleBuilderFrom1To3<TFrom1, TTo1, TTo2, TTo3> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom1To3(
@@ -257,7 +260,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom2To1<TFrom1, TFrom2, TTo1> :
+    public sealed class MappingRuleBuilderFrom2To1<TFrom1, TFrom2, TTo1> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom2To1(
@@ -278,7 +281,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom2To2<TFrom1, TFrom2, TTo1, TTo2> :
+    public sealed class MappingRuleBuilderFrom2To2<TFrom1, TFrom2, TTo1, TTo2> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom2To2(
@@ -308,7 +311,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom2To3<TFrom1, TFrom2, TTo1, TTo2, TTo3> :
+    public sealed class MappingRuleBuilderFrom2To3<TFrom1, TFrom2, TTo1, TTo2, TTo3> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom2To3(
@@ -382,7 +385,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom3To1<TFrom1, TFrom2, TFrom3, TTo1> :
+    public sealed class MappingRuleBuilderFrom3To1<TFrom1, TFrom2, TFrom3, TTo1> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom3To1(
@@ -403,7 +406,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom3To2<TFrom1, TFrom2, TFrom3, TTo1, TTo2> :
+    public sealed class MappingRuleBuilderFrom3To2<TFrom1, TFrom2, TFrom3, TTo1, TTo2> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom3To2(
@@ -433,7 +436,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     }
 
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom3To3<TFrom1, TFrom2, TFrom3, TTo1, TTo2, TTo3> :
+    public sealed class MappingRuleBuilderFrom3To3<TFrom1, TFrom2, TFrom3, TTo1, TTo2, TTo3> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom3To3(

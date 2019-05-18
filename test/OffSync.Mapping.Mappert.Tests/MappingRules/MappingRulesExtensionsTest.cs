@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using NUnit.Framework;
@@ -15,32 +16,24 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         [Test]
         public void ApplyFromArray()
         {
-            var mapper = new TestMapper(
-                b =>
-                {
-                    b.Map(s => s.Name)
-                        .To(t => t.Description);
+            Func<string, object[]> builder = SplitToArray;
 
-                    b.Map(s => s.Values)
-                        .To(t => t.Value1, t => t.Value2)
-                        .Using(SplitToArray);
-
-                    b.IgnoreSource(s => s.Ignored);
-
-                    b.IgnoreTarget(t => t.Excluded);
-
-                    b.Map(s => s.LookupValue)
-                        .To(t => t.LookupId)
-                        .Using(int.Parse);
-                });
+            var sut = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
+                .WithBuilder(builder);
 
             var source = new SourceModel()
             {
                 Values = "1,2",
-                LookupValue = "3",
             };
 
-            var target = mapper.Map(source);
+            var target = new TargetModel();
+
+            sut.Apply(
+                source,
+                target);
 
             Assert.That(
                 target.Value1,
@@ -62,32 +55,25 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         [Test]
         public void ApplyFromArrayChecksLength()
         {
-            var mapper = new TestMapper(
-                b =>
-                {
-                    b.Map(s => s.Name)
-                        .To(t => t.Description);
+            Func<string, object[]> builder = SplitToArray;
 
-                    b.Map(s => s.Values)
-                        .To(t => t.Value1, t => t.Value2)
-                        .Using(SplitToArray);
-
-                    b.IgnoreSource(s => s.Ignored);
-
-                    b.IgnoreTarget(t => t.Excluded);
-
-                    b.Map(s => s.LookupValue)
-                        .To(t => t.LookupId)
-                        .Using(int.Parse);
-                });
+            var sut = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
+                .WithBuilder(builder);
 
             var source = new SourceModel()
             {
                 Values = "1,2,3",
             };
 
+            var target = new TargetModel();
+
             Assert.That(
-                () => mapper.Map(source),
+                () => sut.Apply(
+                    source,
+                    target),
                 Throws.InvalidOperationException);
         }
 
@@ -114,6 +100,61 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     source,
                     target),
                 Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void ApplyToArray()
+        {
+            Func<SourceNested, TargetNested> builder = sn => new TargetNested() { Key = sn.Key, Value = sn.Value };
+
+            var sut = new MappingRule()
+                .WithSource(
+                    typeof(SourceModel).GetProperty(nameof(SourceModel.ItemsEnumerable)),
+                    typeof(SourceNested))
+                .WithTarget(
+                    typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsArray)),
+                    typeof(TargetNested))
+                .WithStrategy(MappingStrategies.MapToArray)
+                .WithBuilder(builder);
+
+            var source = new SourceModel()
+            {
+                ItemsEnumerable = new List<SourceNested>()
+                {
+                    new SourceNested()
+                    {
+                        Key = 1,
+                        Value = "2",
+                    },
+                    new SourceNested()
+                    {
+                        Key = 3,
+                        Value = "4",
+                    },
+                },
+            };
+
+            var target = new TargetModel();
+
+            sut.Apply(
+                source,
+                target);
+
+            Assert.That(
+                target.ItemsArray[0].Key,
+                Is.EqualTo(1));
+
+            Assert.That(
+                target.ItemsArray[0].Value,
+                Is.EqualTo("2"));
+
+            Assert.That(
+                target.ItemsArray[1].Key,
+                Is.EqualTo(3));
+
+            Assert.That(
+                target.ItemsArray[1].Value,
+                Is.EqualTo("4"));
         }
     }
 }

@@ -24,6 +24,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
     {
         string froms = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n}"));
 #>
+
         MappingRuleBuilderFrom<#= i + 1 #><<#= froms #>, TTarget> Map<<#= froms #>>(
 <#
             for (int k = 0; k <= i; k++)
@@ -148,7 +149,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             string fromParameters = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n} from{n}"));
 #>
     [ExcludeFromCodeCoverage]
-    public class MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> :
+    public sealed class MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> :
         AbstractMappingRuleBuilder
     {
         internal MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #>(

@@ -38,6 +38,15 @@ namespace OffSync.Mapping.Mappert.Tests.Common
             Map(s => s.LookupValue)
                 .To(t => t.LookupId)
                 .Using(_lookupService.Lookup);
+
+            MapItems(s => s.ItemsEnumerable)
+                .To(t => t.ItemsArray);
+
+            MapItems(s => s.ItemsArray)
+                .To(t => t.ItemsCollection);
+
+            MapItems(s => s.ItemsArray)
+                .To(t => t.ItemsList);
         }
 
         public TestMapper(

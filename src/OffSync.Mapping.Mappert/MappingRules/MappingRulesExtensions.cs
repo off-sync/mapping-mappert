@@ -9,18 +9,22 @@ namespace OffSync.Mapping.Mappert.MappingRules
     {
         public static MappingRule WithSource<TFrom, TFrom1>(
             this MappingRule mappingRule,
-            Expression<Func<TFrom, TFrom1>> source)
+            Expression<Func<TFrom, TFrom1>> source,
+            Type sourceType = null)
         {
             return mappingRule.WithSource(
-                ExpressionsUtil.GetPropertyFromExpression(source));
+                ExpressionsUtil.GetPropertyFromExpression(source),
+                sourceType);
         }
 
         public static MappingRule WithTarget<TTo, TTo1>(
             this MappingRule mappingRule,
-            Expression<Func<TTo, TTo1>> target)
+            Expression<Func<TTo, TTo1>> target,
+            Type targetType = null)
         {
             return mappingRule.WithTarget(
-                ExpressionsUtil.GetPropertyFromExpression(target));
+                ExpressionsUtil.GetPropertyFromExpression(target),
+                targetType);
         }
     }
 }

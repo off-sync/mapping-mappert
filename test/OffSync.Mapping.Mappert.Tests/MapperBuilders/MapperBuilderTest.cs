@@ -18,17 +18,19 @@ namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
         [Test]
         public void ChecksMappingRules()
         {
+            int expectedRuleCount = 9;
+
             var mappingRules = _sut.CheckedMappingRules;
 
             Assert.That(
                 mappingRules,
-                Has.Exactly(5).Items);
+                Has.Exactly(expectedRuleCount).Items);
 
             mappingRules = _sut.CheckedMappingRules;
 
             Assert.That(
                 mappingRules,
-                Has.Exactly(5).Items);
+                Has.Exactly(expectedRuleCount).Items);
         }
     }
 }
