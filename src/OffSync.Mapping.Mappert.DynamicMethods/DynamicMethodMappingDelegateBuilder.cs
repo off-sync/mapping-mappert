@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
+using GrEmit;
+
 using OffSync.Mapping.Mappert.Practises;
 using OffSync.Mapping.Mappert.Practises.Builders;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
@@ -28,24 +30,25 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                 null,
                 new Type[] { typeof(TSource), typeof(TTarget), typeof(Delegate[]) });
 
-            var il = mapMethod.GetILGenerator();
-
             var builders = new List<Delegate>();
 
-            foreach (var mappingRule in mappingRules)
+            using (var il = new GroboIL(mapMethod))
             {
-                AddMappingRule(
-                    il,
-                    mappingRule,
-                    builders.Count);
-
-                if (mappingRule.Builder != null)
+                foreach (var mappingRule in mappingRules)
                 {
-                    builders.Add(mappingRule.Builder);
-                }
-            }
+                    AddMappingRule(
+                        il,
+                        mappingRule,
+                        builders.Count);
 
-            il.Emit(OpCodes.Ret);
+                    if (mappingRule.Builder != null)
+                    {
+                        builders.Add(mappingRule.Builder);
+                    }
+                }
+
+                il.Ret();
+            }
 
             var mapDelegate = (MapDelegate<TSource, TTarget>)mapMethod.CreateDelegate(
                 typeof(MapDelegate<TSource, TTarget>));
@@ -58,7 +61,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         }
 
         private void AddMappingRule(
-            ILGenerator il,
+            GroboIL il,
             IMappingRule mappingRule,
             int builderIndex)
         {
@@ -87,31 +90,31 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         }
 
         private void AddDirectAssignment(
-            ILGenerator il,
+            GroboIL il,
             IMappingRule mappingRule)
         {
-            il.Emit(OpCodes.Ldarg_1); // target
+            il.Ldarg(1); // target
 
-            il.Emit(OpCodes.Ldarg_0); // source
+            il.Ldarg(0); // source
 
-            il.Emit(OpCodes.Callvirt, mappingRule.SourceProperties[0].GetMethod);
+            il.Call(mappingRule.SourceProperties[0].GetMethod);
 
             if (mappingRule.SourceProperties[0].PropertyType.IsValueType)
             {
                 // box the value type
-                il.Emit(OpCodes.Box, mappingRule.SourceProperties[0].PropertyType);
+                il.Box(mappingRule.SourceProperties[0].PropertyType);
             }
 
             if (mappingRule.TargetProperties[0].PropertyType.IsValueType)
             {
-                il.Emit(OpCodes.Unbox_Any, mappingRule.TargetProperties[0].PropertyType);
+                il.Unbox_Any(mappingRule.TargetProperties[0].PropertyType);
             }
 
-            il.Emit(OpCodes.Callvirt, mappingRule.TargetProperties[0].SetMethod);
+            il.Call(mappingRule.TargetProperties[0].SetMethod);
         }
 
         private void AddBuilderAssignment(
-            ILGenerator il,
+            GroboIL il,
             IMappingRule mappingRule,
             int builderIndex)
         {
@@ -121,41 +124,40 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
             var value = il.DeclareLocal(typeof(object));
 
-            il.Emit(OpCodes.Ldc_I4, mappingRule.SourceProperties.Count);
+            il.Ldc_I4(mappingRule.SourceProperties.Count);
 
-            il.Emit(OpCodes.Newarr, typeof(object));
+            il.Newarr(typeof(object));
 
-            il.Emit(OpCodes.Stloc, froms);
+            il.Stloc(froms);
 
             for (int i = 0; i < mappingRule.SourceProperties.Count; i++)
             {
-                il.Emit(OpCodes.Ldloc, froms);
+                il.Ldloc(froms);
 
-                il.Emit(OpCodes.Ldc_I4, i);
+                il.Ldc_I4(i);
 
-                il.Emit(OpCodes.Ldarg_0); // source
+                il.Ldarg(0); // source
 
-                il.Emit(OpCodes.Callvirt, mappingRule.SourceProperties[i].GetMethod); // source.SourceProperty i
+                il.Call(mappingRule.SourceProperties[i].GetMethod); // source.SourceProperty i
 
                 if (mappingRule.SourceProperties[i].PropertyType.IsValueType)
                 {
                     // box the value type
-                    il.Emit(OpCodes.Box, mappingRule.SourceProperties[i].PropertyType);
+                    il.Box(mappingRule.SourceProperties[i].PropertyType);
                 }
 
-                il.Emit(OpCodes.Stelem_Ref); // froms[i] =
+                il.Stelem(typeof(object)); // froms[i] =
             }
 
-            il.Emit(OpCodes.Ldarg_2); // Builders
+            il.Ldarg(2); // Builders
 
-            il.Emit(OpCodes.Ldc_I4, builderIndex);
+            il.Ldc_I4(builderIndex);
 
-            il.Emit(OpCodes.Ldelem_Ref); // Builders[builderIndex]
+            il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
 
-            il.Emit(OpCodes.Ldloc, froms);
+            il.Ldloc(froms);
 
-            il.Emit(
-                OpCodes.Callvirt,
+            il.Call(
                 typeof(Delegate)
                     .GetMethod(
                         nameof(Delegate.DynamicInvoke),
@@ -191,72 +193,80 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         }
 
         private void AddSingleValueAssignment(
-            ILGenerator il,
-            LocalBuilder value,
+            GroboIL il,
+            GroboIL.Local value,
             PropertyInfo targetProperty)
         {
             // assign builder value directly
-            il.Emit(OpCodes.Stloc, value);
+            il.Stloc(value);
 
-            il.Emit(OpCodes.Ldarg_1); // target
+            il.Ldarg(1); // target
 
-            il.Emit(OpCodes.Ldloc, value);
+            il.Ldloc(value);
 
             if (targetProperty.PropertyType.IsValueType)
             {
-                il.Emit(OpCodes.Unbox_Any, targetProperty.PropertyType);
+                il.Unbox_Any(targetProperty.PropertyType);
             }
 
-            il.Emit(OpCodes.Callvirt, targetProperty.SetMethod); // target.TargetProperty0 =
+            il.Call(targetProperty.SetMethod); // target.TargetProperty0 =
         }
 
         private void AddValueTupleAssignment(
-            ILGenerator il,
+            GroboIL il,
             Type returnType,
-            LocalBuilder value,
+            GroboIL.Local value,
             PropertyInfo[] targetProperties)
         {
-            il.Emit(OpCodes.Unbox_Any, returnType);
+            il.Unbox_Any(returnType);
 
-            il.Emit(OpCodes.Stloc, value);
+            var valueTuple = il.DeclareLocal(returnType);
+
+            il.Stloc(valueTuple);
 
             // builder returns a value tuple
             for (int i = 0; i < targetProperties.Length; i++)
             {
-                il.Emit(OpCodes.Ldarg_1); // target
+                il.Ldarg(1); // target
 
-                il.Emit(OpCodes.Ldloc, value);
+                il.Ldloca(valueTuple); // load by ref
 
-                il.Emit(OpCodes.Ldfld, returnType.GetField($"Item{i + 1}")); // ValueTuple.Item i+1
+                il.Ldfld(returnType.GetField($"Item{i + 1}")); // ValueTuple.Item i+1
 
-                il.Emit(OpCodes.Callvirt, targetProperties[i].SetMethod); // target.TargetProperty i =
+                il.Call(targetProperties[i].SetMethod); // target.TargetProperty i =
             }
         }
 
         private void AddObjectArrayAssignment(
-            ILGenerator il,
-            LocalBuilder value,
+            GroboIL il,
+            GroboIL.Local value,
             PropertyInfo[] targetProperties)
         {
-            il.Emit(OpCodes.Stloc, value);
+            il.Stloc(value);
 
             // builder returns a value tuple
             for (int i = 0; i < targetProperties.Length; i++)
             {
-                il.Emit(OpCodes.Ldarg_1); // target
+                il.Ldarg(1); // target
 
-                il.Emit(OpCodes.Ldloc, value);
+                il.Ldloc(value);
 
-                il.Emit(OpCodes.Ldc_I4, i);
+                il.Castclass(typeof(object[]));
 
-                il.Emit(OpCodes.Ldelem_Ref); // value[i]
+                il.Ldc_I4(i);
+
+                il.Ldelem(typeof(object)); // value[i]
 
                 if (targetProperties[i].PropertyType.IsValueType)
                 {
-                    il.Emit(OpCodes.Unbox_Any, targetProperties[i].PropertyType);
+                    il.Unbox_Any(targetProperties[i].PropertyType);
+                }
+                else
+                {
+                    il.Castclass(targetProperties[i].PropertyType);
                 }
 
-                il.Emit(OpCodes.Callvirt, targetProperties[i].SetMethod); // target.TargetProperty i =
+                il.Call(targetProperties[i].SetMethod); // target.TargetProperty i =
             }
         }
     }
