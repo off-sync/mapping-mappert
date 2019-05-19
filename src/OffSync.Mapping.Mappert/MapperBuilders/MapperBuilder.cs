@@ -1,21 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
+using OffSync.Mapping.Mappert.Reflection;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
     public partial class MapperBuilder<TSource, TTarget>
     {
-        public MapperBuilder(
-            Action<IMapperBuilder<TSource, TTarget>> withMappingRules = null)
+        public MapperBuilder()
         {
-            if (withMappingRules != null)
+        }
+
+        public MapperBuilder(
+            Action<IMapperBuilder<TSource, TTarget>> withMappingRules)
+        {
+            #region Pre-conditions
+            if (withMappingRules == null)
             {
-                withMappingRules(this);
+                throw new ArgumentNullException(nameof(withMappingRules));
             }
+            #endregion
+
+            withMappingRules(this);
         }
 
         /// <summary>
@@ -27,15 +37,14 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         /// A read-write lock that ensures that the mapping rules are only
         /// checked once.
         /// </summary>
-        private readonly ReaderWriterLockSlim _mappingRulesLock = new ReaderWriterLockSlim(
-            LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLockSlim _mappingRulesLock = new ReaderWriterLockSlim();
 
         /// <summary>
         /// Whether the mapping rules have already been checked.
         /// </summary>
         private bool _mappingRulesChecked = false;
 
-        private MappingRule[] _checkedMappingRules = null;
+        private MappingDelegate<TSource, TTarget> _mappingDelegate = null;
 
         /// <summary>
         /// Uses the <see cref="_mappingRulesLock" /> to
@@ -89,11 +98,11 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
                 () =>
                 {
                     throw new InvalidOperationException(
-                        $"{nameof(AddMappingRule)} only allowed when rules are unchecked");
+                        $"{nameof(AddMappingRule)} only allowed before rules have been checked");
                 },
                 () =>
                 {
-                    var mappingRule = new MappingRule(_mappingDelegateBuilder);
+                    var mappingRule = new MappingRule();
 
                     _mappingRules.Add(mappingRule);
 
@@ -106,55 +115,68 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         /// and sets <see cref="_mappingRulesChecked"/> to true afterwards.
         /// </summary>
         /// <returns></returns>
-        protected MappingRule[] GetCheckedMappingRules()
+        protected MappingDelegate<TSource, TTarget> GetCheckedMappingDelegate()
         {
             return WithMappingRulesCheckedLocked(
-                () => _checkedMappingRules,
+                () => _mappingDelegate,
                 () =>
                 {
-                    CheckMappingRules(_mappingRules);
+                    var checkedMappingRules = CheckMappingRules(_mappingRules);
 
-                    _checkedMappingRules = _mappingRules.ToArray();
+                    _mappingDelegate = CreateMappingDelegate(checkedMappingRules);
 
                     _mappingRulesChecked = true;
 
-                    return _checkedMappingRules;
+                    return _mappingDelegate;
                 });
         }
 
         /// <summary>
-        /// Is called only once when <see cref="GetCheckedMappingRules"/> is called and the 
-        /// rules have not been checked yet. The provided mapping rules must be checked and 
-        /// a checked version must be returned.
+        /// Is called only once when <see cref="GetCheckedMappingDelegate"/> is called and the 
+        /// rules have not been checked yet. The provided mapping rules must be checked and can
+        /// be changed to make the complete set valid.
         /// <para>
         /// The default implementation performs the following checks:
         /// <list type="bullet">
         /// <item><description>Ensures that there are no duplicate target mappings.</description></item>
         /// <item><description>Ensures that all target properties are mapped.</description></item>
         /// <item><description>Ensures that all source properties are mapped.</description></item>
-        /// <item><description>Removes any mappings without source or target properties.</description></item>
-        /// <item><description>Ensures that all remaining mapping rules without a builder map exactly one source property to one target property.</description></item>
+        /// <item><description>Removes any mappings without target properties, or without source properties and no builder.</description></item>
+        /// <item><description>Ensures that all remaining mapping rules have a valid builder where required.</description></item>
         /// </list>
         /// </para>
         /// </summary>
         /// <param name="mappingRules"></param>
         /// <returns></returns>
-        protected virtual void CheckMappingRules(
-            ICollection<MappingRule> mappingRules)
+        protected virtual IEnumerable<IMappingRule> CheckMappingRules(
+            IEnumerable<IMappingRule> mappingRules)
         {
             MappingRulesUtil.EnsureNoDuplicateTargetMappings(mappingRules);
 
-            MappingRulesUtil.EnsureAllTargetPropertiesMapped<TSource, TTarget>(
-                mappingRules,
-                () => AddMappingRule());
+            mappingRules = MappingRulesUtil.WithAllTargetPropertiesMapped<TSource, TTarget>(mappingRules);
 
             MappingRulesUtil.EnsureAllSourcePropertiesMapped<TSource>(mappingRules);
 
-            MappingRulesUtil.RemoveIgnoringMappingRules(mappingRules);
+            mappingRules = MappingRulesUtil.WithoutIgnoringMappingRules(mappingRules);
+
+            mappingRules = MappingRulesUtil.WithAutoMappingBuilders(mappingRules);
 
             MappingRulesUtil.EnsureValidBuilders(mappingRules);
 
             MappingRulesUtil.EnsureValidItemsMappings(mappingRules);
+
+            return mappingRules;
+        }
+
+        protected virtual MappingDelegate<TSource, TTarget> CreateMappingDelegate(
+            IEnumerable<IMappingRule> mappingRules)
+        {
+            if (_mappingDelegateBuilder == null)
+            {
+                _mappingDelegateBuilder = new ReflectionMappingDelegateBuilder();
+            }
+
+            return _mappingDelegateBuilder.CreateMappingDelegate<TSource, TTarget>(mappingRules);
         }
     }
 }

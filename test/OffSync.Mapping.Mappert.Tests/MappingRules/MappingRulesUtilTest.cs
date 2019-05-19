@@ -1,8 +1,11 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
 
-using OffSync.Mapping.Mappert.DynamicMethods;
+using NUnit.Framework;
+
 using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Tests.Common;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests.MappingRules
 {
@@ -40,7 +43,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 });
 
             Assert.That(
-                () => builder.CheckedMappingRules,
+                () => builder.Map(null),
                 Throws.InvalidOperationException);
         }
 
@@ -77,7 +80,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 });
 
             Assert.That(
-                () => builder.CheckedMappingRules,
+                () => builder.Map(null),
                 Throws.InvalidOperationException);
         }
 
@@ -116,7 +119,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 });
 
             Assert.That(
-                () => builder.CheckedMappingRules,
+                () => builder.Map(null),
                 Throws.InvalidOperationException);
         }
 
@@ -127,10 +130,12 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Nested)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Nested)));
 
-            MappingRulesUtil.EnsureValidBuilders(rule.Yield());
+            var checkedRule = MappingRulesUtil
+                .WithAutoMappingBuilders(rule.Yield())
+                .Single();
 
             Assert.That(
-                rule.Builder,
+                checkedRule.Builder,
                 Is.Not.Null);
 
             rule = new MappingRule()
@@ -138,7 +143,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Description)));
 
             Assert.That(
-                () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),
+                () => MappingRulesUtil.WithAutoMappingBuilders(rule.Yield()),
                 Throws.InvalidOperationException);
         }
 
@@ -163,7 +168,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Name)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
-                .WithStrategy(MappingStrategies.MapToArray);
+                .WithType(MappingRuleTypes.MapToArray);
 
             Assert.That(
                 () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
@@ -174,7 +179,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
-                .WithStrategy(MappingStrategies.MapToArray);
+                .WithType(MappingRuleTypes.MapToArray);
 
             Assert.That(
                 () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
@@ -184,7 +189,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
             rule = new MappingRule()
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
-                .WithStrategy(MappingStrategies.MapToArray);
+                .WithType(MappingRuleTypes.MapToArray);
 
             Assert.That(
                 () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
@@ -194,7 +199,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
             rule = new MappingRule()
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.ItemsArray)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
-                .WithStrategy(MappingStrategies.MapToArray);
+                .WithType(MappingRuleTypes.MapToArray);
 
             Assert.That(
                 () => MappingRulesUtil.EnsureValidItemsMappings(rule.Yield()),
@@ -211,15 +216,11 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         [Test]
         public void CreateAutoMapping()
         {
-            var mappingDelegateBuilder = new DynamicMethodMappingDelegateBuilder();
+            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
+                typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsList)));
 
             MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
-                typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsList)),
-                () => new MappingRule(mappingDelegateBuilder));
-
-            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
-                typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)),
-                () => new MappingRule(mappingDelegateBuilder));
+                typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)));
         }
     }
 }

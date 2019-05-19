@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OffSync.Mapping.Mappert.Tests.Common
+namespace OffSync.Mapping.Mappert.Tests.Models
 {
     public class TargetModel
     {

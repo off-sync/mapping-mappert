@@ -2,22 +2,29 @@
 
 namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
 {
-    public class Reference
+    public class ReferenceMapper
     {
         public void Map(
             Source source,
-            Target target,
-            Delegate builder)
+            Target target)
         {
-            var froms = new object[1];
+            Func<string, (int, string)> builder = TupleSplitter;
 
-            froms[0] = source.Id;
+            object[] froms = new object[] { source.Id };
 
             var value = ((int, string))builder.DynamicInvoke(froms);
 
             target.Id = value.Item1;
 
             target.Value1 = value.Item2;
+        }
+
+        private (int, string) TupleSplitter(
+            string values)
+        {
+            var splitted = values.Split(',');
+
+            return (int.Parse(splitted[0]), splitted[1]);
         }
     }
 

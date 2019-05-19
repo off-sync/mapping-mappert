@@ -1,114 +1,133 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-using OffSync.Mapping.Mappert.Common;
-using OffSync.Mapping.Mappert.Interfaces;
+using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Mappert.Practises.Builders;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
 
 namespace OffSync.Mapping.Mappert.DynamicMethods
 {
     public class DynamicMethodMappingDelegateBuilder :
         IMappingDelegateBuilder
     {
-        public Delegate CreateMappingDelegate(
-            Type sourceType,
-            PropertyInfo[] sourceProperties,
-            Type targetType,
-            PropertyInfo[] targetProperties,
-            Delegate builder)
+        public MappingDelegate<TSource, TTarget> CreateMappingDelegate<TSource, TTarget>(
+            IEnumerable<IMappingRule> mappingRules)
         {
-            if (builder == null &&
-                (sourceProperties.Length != 1 ||
-                targetProperties.Length != 1))
+            #region Pre-conditions
+            if (mappingRules == null)
             {
-                throw new ArgumentException(
-                    $"no builder provided, exactly on source and target property must be provided",
-                    nameof(builder));
+                throw new ArgumentNullException(nameof(mappingRules));
+            }
+            #endregion
+
+            var mapMethod = new DynamicMethod(
+                $"Map{typeof(TSource).Name}To{typeof(TTarget).Name}",
+                null,
+                new Type[] { typeof(TSource), typeof(TTarget), typeof(Delegate[]) });
+
+            var il = mapMethod.GetILGenerator();
+
+            var builders = new List<Delegate>();
+
+            foreach (var mappingRule in mappingRules)
+            {
+                AddMappingRule(
+                    il,
+                    mappingRule,
+                    builders.Count);
+
+                if (mappingRule.Builder != null)
+                {
+                    builders.Add(mappingRule.Builder);
+                }
             }
 
-            // build dynamic method for this builder
-            var mapping = new DynamicMethod(
-                "Mapping",
-                null,
-                new Type[] { sourceType, targetType, typeof(Delegate) });
+            il.Emit(OpCodes.Ret);
 
-            var il = mapping.GetILGenerator();
+            var mapDelegate = (MapDelegate<TSource, TTarget>)mapMethod.CreateDelegate(
+                typeof(MapDelegate<TSource, TTarget>));
 
-            if (builder == null)
+            var mappingDelegate = new DynamicMethodMappingDelegate<TSource, TTarget>(
+                mapDelegate,
+                builders.ToArray());
+
+            return mappingDelegate.Map;
+        }
+
+        private void AddMappingRule(
+            ILGenerator il,
+            IMappingRule mappingRule,
+            int builderIndex)
+        {
+            if (mappingRule.Builder == null &&
+                (mappingRule.SourceProperties.Count != 1 ||
+                mappingRule.TargetProperties.Count != 1))
+            {
+                throw new ArgumentException(
+                    $"no builder provided, exactly one source and target property must be provided",
+                    nameof(mappingRule));
+            }
+
+            if (mappingRule.Builder == null)
             {
                 AddDirectAssignment(
                     il,
-                    sourceProperties[0],
-                    targetProperties[0]);
+                    mappingRule);
             }
             else
             {
                 AddBuilderAssignment(
                     il,
-                    sourceProperties,
-                    targetProperties,
-                    builder);
+                    mappingRule,
+                    builderIndex);
             }
-
-            il.Emit(OpCodes.Ret);
-
-            var mappingType = typeof(Action<,,>)
-                .MakeGenericType(
-                    sourceType,
-                    targetType,
-                    typeof(Delegate));
-
-            return mapping.CreateDelegate(mappingType);
         }
 
         private void AddDirectAssignment(
             ILGenerator il,
-            PropertyInfo sourceProperty,
-            PropertyInfo targetProperty)
+            IMappingRule mappingRule)
         {
             il.Emit(OpCodes.Ldarg_1); // target
 
             il.Emit(OpCodes.Ldarg_0); // source
 
-            il.Emit(OpCodes.Callvirt, sourceProperty.GetMethod);
+            il.Emit(OpCodes.Callvirt, mappingRule.SourceProperties[0].GetMethod);
 
-            if (sourceProperty.PropertyType.IsValueType)
+            if (mappingRule.SourceProperties[0].PropertyType.IsValueType)
             {
                 // box the value type
-                il.Emit(OpCodes.Box, sourceProperty.PropertyType);
+                il.Emit(OpCodes.Box, mappingRule.SourceProperties[0].PropertyType);
             }
 
-            if (targetProperty.PropertyType.IsValueType)
+            if (mappingRule.TargetProperties[0].PropertyType.IsValueType)
             {
-                il.Emit(OpCodes.Unbox_Any, targetProperty.PropertyType);
+                il.Emit(OpCodes.Unbox_Any, mappingRule.TargetProperties[0].PropertyType);
             }
 
-            il.Emit(OpCodes.Callvirt, targetProperty.SetMethod);
+            il.Emit(OpCodes.Callvirt, mappingRule.TargetProperties[0].SetMethod);
         }
 
         private void AddBuilderAssignment(
             ILGenerator il,
-            PropertyInfo[] sourceProperties,
-            PropertyInfo[] targetProperties,
-            Delegate builder)
+            IMappingRule mappingRule,
+            int builderIndex)
         {
-            // check and get builder type
-            var builderType = BuilderUtil.GetBuilderType(
-                sourceProperties,
-                targetProperties,
-                builder);
+            var builderType = BuildersUtil.GetBuilderType(mappingRule);
 
             var froms = il.DeclareLocal(typeof(object[]));
 
             var value = il.DeclareLocal(typeof(object));
 
-            il.Emit(OpCodes.Ldc_I4, sourceProperties.Length);
+            il.Emit(OpCodes.Ldc_I4, mappingRule.SourceProperties.Count);
 
             il.Emit(OpCodes.Newarr, typeof(object));
 
             il.Emit(OpCodes.Stloc, froms);
 
-            for (int i = 0; i < sourceProperties.Length; i++)
+            for (int i = 0; i < mappingRule.SourceProperties.Count; i++)
             {
                 il.Emit(OpCodes.Ldloc, froms);
 
@@ -116,18 +135,22 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
                 il.Emit(OpCodes.Ldarg_0); // source
 
-                il.Emit(OpCodes.Callvirt, sourceProperties[i].GetMethod); // source.SourceProperty i
+                il.Emit(OpCodes.Callvirt, mappingRule.SourceProperties[i].GetMethod); // source.SourceProperty i
 
-                if (sourceProperties[i].PropertyType.IsValueType)
+                if (mappingRule.SourceProperties[i].PropertyType.IsValueType)
                 {
                     // box the value type
-                    il.Emit(OpCodes.Box, sourceProperties[i].PropertyType);
+                    il.Emit(OpCodes.Box, mappingRule.SourceProperties[i].PropertyType);
                 }
 
                 il.Emit(OpCodes.Stelem_Ref); // froms[i] =
             }
 
-            il.Emit(OpCodes.Ldarg_2);
+            il.Emit(OpCodes.Ldarg_2); // Builders
+
+            il.Emit(OpCodes.Ldc_I4, builderIndex);
+
+            il.Emit(OpCodes.Ldelem_Ref); // Builders[builderIndex]
 
             il.Emit(OpCodes.Ldloc, froms);
 
@@ -144,16 +167,16 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                     AddSingleValueAssignment(
                         il,
                         value,
-                        targetProperties[0]);
+                        mappingRule.TargetProperties[0]);
 
                     break;
 
                 case BuilderTypes.ValueTuple:
                     AddValueTupleAssignment(
                         il,
-                        builder.Method.ReturnType,
+                        mappingRule.Builder.Method.ReturnType,
                         value,
-                        targetProperties);
+                        mappingRule.TargetProperties.ToArray());
 
                     break;
 
@@ -161,7 +184,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                     AddObjectArrayAssignment(
                         il,
                         value,
-                        targetProperties);
+                        mappingRule.TargetProperties.ToArray());
 
                     break;
             }

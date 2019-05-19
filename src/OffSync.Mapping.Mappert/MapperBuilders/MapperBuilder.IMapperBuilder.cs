@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-using OffSync.Mapping.Mappert.Interfaces;
 using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
@@ -28,7 +28,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             Expression<Func<TSource, IEnumerable<TFrom>>> from)
         {
             var mappingRule = AddMappingRule()
-                .WithSource(from, typeof(TFrom));
+                .WithSourceItems(from, typeof(TFrom));
 
             return new MappingItemsRuleBuilder<TFrom, TTarget>(mappingRule);
         }

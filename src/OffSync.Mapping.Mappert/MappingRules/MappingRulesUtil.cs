@@ -4,13 +4,15 @@ using System.Linq;
 using System.Reflection;
 
 using OffSync.Mapping.Mappert.Common;
+using OffSync.Mapping.Mappert.Practises.Builders;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
 
 namespace OffSync.Mapping.Mappert.MappingRules
 {
     public static class MappingRulesUtil
     {
         public static void EnsureNoDuplicateTargetMappings(
-            IEnumerable<MappingRule> mappingRules)
+            IEnumerable<IMappingRule> mappingRules)
         {
             var targetDuplicates = mappingRules
                 .SelectMany(mi => mi.TargetProperties)
@@ -28,10 +30,11 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
         }
 
-        public static void EnsureAllTargetPropertiesMapped<TSource, TTarget>(
-            ICollection<MappingRule> mappingRules,
-            Func<MappingRule> addMappingRule)
+        public static IEnumerable<IMappingRule> WithAllTargetPropertiesMapped<TSource, TTarget>(
+            IEnumerable<IMappingRule> mappingRules)
         {
+            var rules = new List<IMappingRule>(mappingRules);
+
             // create lookup of mapped target property names
             var mappedTargetPropertyNames = new HashSet<string>(mappingRules
                 .SelectMany(mi => mi.TargetProperties)
@@ -52,7 +55,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
                 // not mapped, try to add an auto-mapping
                 if (!TryCreateAutoMapping<TSource>(
                     targetProperty,
-                    addMappingRule,
                     out var mappingRule,
                     out var exception))
                 {
@@ -60,11 +62,16 @@ namespace OffSync.Mapping.Mappert.MappingRules
                         $"unable to create auto-mapping for property '{targetProperty.Name}'",
                         exception);
                 }
+
+                // add auto-mapping rule
+                rules.Add(mappingRule);
             }
+
+            return rules;
         }
 
         public static void EnsureAllSourcePropertiesMapped<TSource>(
-            IEnumerable<MappingRule> mappingRules)
+            IEnumerable<IMappingRule> mappingRules)
         {
             // create lookup of mapped source property names
             var mappedSourcePropertyNames = new HashSet<string>(mappingRules
@@ -85,81 +92,187 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
         }
 
-        public static void RemoveIgnoringMappingRules(
-            ICollection<MappingRule> mappingRules)
+        /// <summary>
+        /// Filters from the provided mapping rules the rules that:
+        /// <list type="bullet">
+        /// <item><description>Don't have any target properties.</description></item>
+        /// <item><description>Don't have any source properties, and no builder.</description></item>
+        /// </list>
+        /// </summary>
+        /// <param name="mappingRules">The mapping rules to process.</param>
+        public static IEnumerable<IMappingRule> WithoutIgnoringMappingRules(
+            IEnumerable<IMappingRule> mappingRules)
         {
-            // copy mapping rules to allow removal during enumeration
-            var mappingRulesCopy = mappingRules.ToArray();
+            return mappingRules
+                .Where(r => !IsIgnoringMappingRule(r))
+                .ToArray();
+        }
 
-            foreach (var mappingRule in mappingRulesCopy)
+        private static bool IsIgnoringMappingRule(
+            IMappingRule mappingRule)
+        {
+            if (!mappingRule.TargetProperties.Any())
             {
-                if (!mappingRule.SourceProperties.Any() ||
-                    !mappingRule.TargetProperties.Any())
+                // no target properties
+                return true;
+            }
+
+            if (!mappingRule.SourceProperties.Any() &&
+                mappingRule.Builder == null)
+            {
+                // no source properties, and no builder
+                return true;
+            }
+
+            return false;
+        }
+
+        // FIXME refactor
+        public static IEnumerable<IMappingRule> WithAutoMappingBuilders(
+            IEnumerable<IMappingRule> mappingRules)
+        {
+            var rules = new List<IMappingRule>(mappingRules);
+
+            for (int i = 0; i < rules.Count; i++)
+            {
+                // builders must be present for unassignable types
+                if (rules[i].Builder == null &&
+                    rules[i].SourceProperties.Count == 1 &&
+                    rules[i].TargetProperties.Count == 1)
                 {
-                    // remove mapping rule
-                    mappingRules.Remove(mappingRule);
+                    object mapper;
+                    Exception exception;
+
+                    switch (rules[i].Type)
+                    {
+                        case MappingRuleTypes.MapToArray:
+                        case MappingRuleTypes.MapToCollection:
+                            if (rules[i].TargetItemsType.IsAssignableFrom(rules[i].SourceItemsType))
+                            {
+                                // target items type can be assigned from source items type
+                                continue;
+                            }
+
+                            // create auto-mapper for items
+                            if (!Util.Try(() => MappersUtil.CreateAutoMapper(
+                                rules[i].SourceItemsType,
+                                rules[i].TargetItemsType),
+                                out mapper,
+                                out exception))
+                            {
+                                throw new InvalidOperationException(
+                                    $"unable to create auto-mapper for ['{rules[i]}']",
+                                    exception);
+                            }
+
+                            break;
+
+                        // MappingRuleTypes.MapToValue
+                        default:
+                            if (rules[i].TargetProperties[0].PropertyType.IsAssignableFrom(rules[i].SourceProperties[0].PropertyType))
+                            {
+                                // target property can be assigned from source property
+                                continue;
+                            }
+
+                            // create auto-mapper for properties
+                            if (!Util.Try(() => MappersUtil.CreateAutoMapper(
+                                rules[i].SourceProperties[0].PropertyType,
+                                rules[i].TargetProperties[0].PropertyType),
+                                out mapper,
+                                out exception))
+                            {
+                                throw new InvalidOperationException(
+                                    $"unable to create auto-mapper for ['{rules[i]}']",
+                                    exception);
+                            }
+
+                            break;
+                    }
+
+                    // create builder from mapper
+                    if (!Util.Try(() => MappersUtil.CreateMapperDelegate(
+                        mapper),
+                        out var builder,
+                        out exception
+                        ))
+                    {
+                        throw new InvalidOperationException(
+                            $"unable to create auto-mapper delegate for ['{rules[i]}']",
+                            exception);
+                    }
+
+                    // create new mapping rule with builder
+                    var rule = new MappingRule()
+                        .WithType(rules[i].Type)
+                        .WithBuilder(builder);
+
+                    switch (rules[i].Type)
+                    {
+                        case MappingRuleTypes.MapToArray:
+                        case MappingRuleTypes.MapToCollection:
+                            rule
+                                .WithSourceItems(
+                                    rules[i].SourceProperties[0],
+                                    rules[i].SourceItemsType)
+                                .WithTargetItems(
+                                    rules[i].TargetProperties[0],
+                                    rules[i].TargetItemsType);
+
+                            break;
+
+                        // MappingRuleTypes.MapToValue
+                        default:
+                            rule
+                                .WithSource(rules[i].SourceProperties[0])
+                                .WithTarget(rules[i].TargetProperties[0]);
+
+                            break;
+                    }
+
+                    rules[i] = rule;
                 }
             }
+
+            return rules;
         }
 
         public static void EnsureValidBuilders(
-            IEnumerable<MappingRule> mappingRules)
+            IEnumerable<IMappingRule> mappingRules)
         {
-            // builders must be present for unassignable types
-            var missingBuilders = mappingRules
-                .Where(r =>
-                    r.Builder == null &&
-                    r.SourceProperties.Count == 1 &&
-                    r.TargetProperties.Count == 1 &&
-                    !r.TargetTypes[0].IsAssignableFrom(r.SourceTypes[0]));
-
-            foreach (var rule in missingBuilders)
+            foreach (var rule in mappingRules)
             {
-                try
+                if (rule.Builder == null)
                 {
-                    // create auto-mapper
-                    var mapper = MappersUtil.CreateAutoMapper(
-                        rule.SourceTypes[0],
-                        rule.TargetTypes[0]);
+                    // builders must be present for mappings from/to multiple properties
+                    if (rule.SourceProperties.Count > 1 ||
+                        rule.TargetProperties.Count > 1)
+                    {
+                        throw new InvalidOperationException(
+                            $"builder missing for multi-property mapping rule: {rule}");
+                    }
 
-                    // create builder from mapper
-                    var builder = MappersUtil.CreateMapperDelegate(mapper);
+                    // builders must be present for mappings without source properties
+                    if (rule.SourceProperties.Count == 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"builder missing for target properties only mapping rule: {rule}");
+                    }
 
-                    rule.WithBuilder(builder);
+                    continue;
                 }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException(
-                        $"unable to create auto-mapper for ['{rule.SourceProperties[0].Name}' -> '{rule.TargetProperties[0].Name}']",
-                        ex);
-                }
-            }
 
-            // builders must be present for mappings from/to multiple properties
-            missingBuilders = mappingRules
-                .Where(r =>
-                    r.Builder == null &&
-                        (r.SourceProperties.Count > 1 ||
-                        r.TargetProperties.Count > 1));
-
-            if (missingBuilders.Any())
-            {
-                var rules = string.Join(
-                    ", ",
-                    missingBuilders.Select(
-                        r => $"['{string.Join("', '", r.SourceProperties.Select(pi => pi.Name))}' -> '{string.Join("', '", r.TargetProperties.Select(pi => pi.Name))}']"));
-
-                throw new InvalidOperationException(
-                    $"builder missing for multi-property mapping rules: {rules}");
+                // check builder parameter and return types
+                BuildersUtil.GetBuilderType(rule);
             }
         }
 
         public static void EnsureValidItemsMappings(
-            IEnumerable<MappingRule> mappingRules)
+            IEnumerable<IMappingRule> mappingRules)
         {
             var itemsRules = mappingRules
-                .Where(r => r.MappingStrategy == MappingStrategies.MapToArray ||
-                    r.MappingStrategy == MappingStrategies.MapToCollection);
+                .Where(r => r.Type == MappingRuleTypes.MapToArray ||
+                    r.Type == MappingRuleTypes.MapToCollection);
 
             foreach (var rule in itemsRules)
             {
@@ -220,8 +333,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
         }
 
         public static MappingRule CreateAutoMapping<TSource>(
-            PropertyInfo targetProperty,
-            Func<MappingRule> addMappingRule)
+            PropertyInfo targetProperty)
         {
             // try to get the same-named property from the source type
             var sourceProperty = typeof(TSource)
@@ -236,6 +348,10 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
 
             // create new mapping rule
+            var mappingRule = new MappingRule()
+                .WithSource(sourceProperty)
+                .WithTarget(targetProperty);
+
             var sourceType = sourceProperty.PropertyType;
 
             var targetType = targetProperty.PropertyType;
@@ -243,23 +359,19 @@ namespace OffSync.Mapping.Mappert.MappingRules
             if (targetType.IsAssignableFrom(sourceType))
             {
                 // properties have assignable types: no builder required
-                return addMappingRule()
-                    .WithSource(sourceProperty)
-                    .WithTarget(targetProperty);
+                return mappingRule;
             }
-
-            MappingRule mappingRule;
 
             // check if both properties have items
             if (sourceType.TryGetSourceItemsType(out var sourceItemsType) &&
                 targetType.TryGetTargetItemsType(out var targetItemsType))
             {
-                mappingRule = addMappingRule()
-                    .WithSource(sourceProperty, sourceItemsType)
-                    .WithTarget(targetProperty, targetItemsType)
-                    .WithStrategy(targetType.IsArray ?
-                        MappingStrategies.MapToArray :
-                        MappingStrategies.MapToCollection);
+                mappingRule = new MappingRule()
+                    .WithSourceItems(sourceProperty, sourceItemsType)
+                    .WithTargetItems(targetProperty, targetItemsType)
+                    .WithType(targetType.IsArray ?
+                        MappingRuleTypes.MapToArray :
+                        MappingRuleTypes.MapToCollection);
 
                 sourceType = sourceItemsType;
 
@@ -270,12 +382,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
                     // items have assignable types: no builder required
                     return mappingRule;
                 }
-            }
-            else
-            {
-                mappingRule = addMappingRule()
-                    .WithSource(sourceProperty)
-                    .WithTarget(targetProperty);
             }
 
             // create auto-mapper
@@ -292,15 +398,12 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
         public static bool TryCreateAutoMapping<TSource>(
             PropertyInfo targetProperty,
-            Func<MappingRule> addMappingRule,
             out MappingRule mappingRule,
             out Exception exception)
         {
             try
             {
-                mappingRule = CreateAutoMapping<TSource>(
-                    targetProperty,
-                    addMappingRule);
+                mappingRule = CreateAutoMapping<TSource>(targetProperty);
 
                 exception = null;
 

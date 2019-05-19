@@ -10,9 +10,9 @@ Intel Core i7-4700HQ CPU 2.40GHz (Haswell), 1 CPU, 8 logical and 4 physical core
 Job=Core  Runtime=Core  
 ```
 
-|           Method |       Mean |     Error |   StdDev | Ratio | RatioSD | Rank |
-|----------------- |-----------:|----------:|---------:|------:|--------:|-----:|
-|         MapEmpty |   131.3 ns |  1.747 ns | 1.634 ns |  1.00 |    0.00 |    1 |
-|        MapSimple |   828.3 ns |  1.079 ns | 1.010 ns |  6.31 |    0.08 |    2 |
-| MapArraySplitter | 1,949.2 ns | 10.387 ns | 9.716 ns | 14.85 |    0.22 |    3 |
-| MapTupleSplitter | 2,419.6 ns |  3.317 ns | 2.940 ns | 18.42 |    0.23 |    4 |
+|           Method |       Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
+|----------------- |-----------:|----------:|----------:|------:|--------:|-----:|
+|         MapEmpty |   130.9 ns | 0.1667 ns | 0.1477 ns |  1.00 |    0.00 |    1 |
+|        MapSimple |   836.9 ns | 1.8635 ns | 1.7431 ns |  6.39 |    0.02 |    2 |
+| MapArraySplitter | 2,010.6 ns | 3.8129 ns | 3.1840 ns | 15.36 |    0.03 |    3 |
+| MapTupleSplitter | 2,431.0 ns | 6.6690 ns | 6.2382 ns | 18.57 |    0.05 |    4 |

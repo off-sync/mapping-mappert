@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-using OffSync.Mapping.Mappert.Interfaces;
+using OffSync.Mapping.Mappert.Practises;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {

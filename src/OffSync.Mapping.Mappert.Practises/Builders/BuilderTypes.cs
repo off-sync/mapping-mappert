@@ -1,7 +1,8 @@
-﻿namespace OffSync.Mapping.Mappert.Common
+﻿namespace OffSync.Mapping.Mappert.Practises.Builders
 {
     public enum BuilderTypes
     {
+        NoBuilder,
         SingleValue,
         ValueTuple,
         ObjectArray,

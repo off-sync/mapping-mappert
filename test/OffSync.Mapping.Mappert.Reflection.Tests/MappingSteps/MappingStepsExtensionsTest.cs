@@ -2,27 +2,36 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using NUnit.Framework;
 
-using OffSync.Mapping.Mappert.MappingRules;
-using OffSync.Mapping.Mappert.Tests.Common;
+using OffSync.Mapping.Mappert.Practises.Builders;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
+using OffSync.Mapping.Mappert.Reflection.MappingSteps;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests.MappingRules
 {
     [TestFixture]
-    public class MappingRulesExtensionsTest
+    public class MappingStepsExtensionsTest
     {
         [Test]
         public void ApplyFromArray()
         {
             Func<string, object[]> builder = SplitToArray;
 
-            var sut = new MappingRule(null)
-                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
-                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
-                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
-                .WithBuilder(builder);
+            var sut = new MappingStep()
+            {
+                SourceProperties = new PropertyInfo[] { typeof(SourceModel).GetProperty(nameof(SourceModel.Values)) },
+                TargetProperties = new PropertyInfo[]
+                {
+                    typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)),
+                    typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)),
+                },
+                Builder = builder,
+                BuilderType = BuilderTypes.ObjectArray,
+            };
 
             var source = new SourceModel()
             {
@@ -57,11 +66,17 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         {
             Func<string, object[]> builder = SplitToArray;
 
-            var sut = new MappingRule(null)
-                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
-                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
-                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)))
-                .WithBuilder(builder);
+            var sut = new MappingStep()
+            {
+                SourceProperties = new PropertyInfo[] { typeof(SourceModel).GetProperty(nameof(SourceModel.Values)) },
+                TargetProperties = new PropertyInfo[]
+                {
+                    typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)),
+                    typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)),
+                },
+                Builder = builder,
+                BuilderType = BuilderTypes.ObjectArray,
+            };
 
             var source = new SourceModel()
             {
@@ -78,33 +93,24 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         }
 
         [Test]
-        public void ApplyFromUnsupportedType()
-        {
-            Func<object, object> builder = o => new object();
-
-            Assert.That(
-                () => new MappingRule(null)
-                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
-                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
-                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Description)))
-                    .WithBuilder(builder),
-                Throws.ArgumentException);
-        }
-
-        [Test]
         public void ApplyToArray()
         {
             Func<SourceNested, TargetNested> builder = sn => new TargetNested() { Key = sn.Key, Value = sn.Value };
 
-            var sut = new MappingRule(null)
-                .WithSource(
+            var sut = new MappingStep()
+            {
+                SourceProperties = new PropertyInfo[] {
                     typeof(SourceModel).GetProperty(nameof(SourceModel.ItemsEnumerable)),
-                    typeof(SourceNested))
-                .WithTarget(
+                },
+                TargetProperties = new PropertyInfo[]
+                {
                     typeof(TargetModel).GetProperty(nameof(TargetModel.ItemsArray)),
-                    typeof(TargetNested))
-                .WithStrategy(MappingStrategies.MapToArray)
-                .WithBuilder(builder);
+                },
+                TargetItemType = typeof(TargetNested),
+                MappingRuleType = MappingRuleTypes.MapToArray,
+                Builder = builder,
+                BuilderType = BuilderTypes.ObjectArray,
+            };
 
             var source = new SourceModel()
             {

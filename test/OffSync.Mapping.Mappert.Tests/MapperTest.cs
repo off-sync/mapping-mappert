@@ -3,6 +3,7 @@
 using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.Tests.Common;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests
 {

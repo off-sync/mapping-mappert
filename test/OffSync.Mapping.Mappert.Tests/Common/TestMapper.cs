@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 
-using OffSync.Mapping.Mappert.DynamicMethods;
 using OffSync.Mapping.Mappert.MapperBuilders;
-using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests.Common
 {
@@ -25,7 +23,8 @@ namespace OffSync.Mapping.Mappert.Tests.Common
 
         public TestMapper()
         {
-            WithMappingDelegateBuilder(new DynamicMethodMappingDelegateBuilder());
+            // FIXME
+            //WithMappingDelegateBuilder(new DynamicMethodMappingDelegateBuilder());
 
             Map(s => s.Name)
                 .To(t => t.Description);
@@ -57,8 +56,6 @@ namespace OffSync.Mapping.Mappert.Tests.Common
             base(withRules)
         {
         }
-
-        public IEnumerable<MappingRule> CheckedMappingRules => GetCheckedMappingRules();
 
         private (string, string) ValueSplitter(
             string values)

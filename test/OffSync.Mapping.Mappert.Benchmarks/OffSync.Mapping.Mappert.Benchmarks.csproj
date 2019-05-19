@@ -9,12 +9,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.2|AnyCPU'">
     <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.Benchmarks.ruleset</CodeAnalysisRuleSet>
-    <DefineConstants>TRACE;PROFILER</DefineConstants>
+    <DefineConstants>TRACE;PROFILERT</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.2|AnyCPU'">
     <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.Benchmarks.ruleset</CodeAnalysisRuleSet>
-    <DefineConstants>TRACE;PROFILER</DefineConstants>
+    <DefineConstants>TRACE;PROFILERT</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

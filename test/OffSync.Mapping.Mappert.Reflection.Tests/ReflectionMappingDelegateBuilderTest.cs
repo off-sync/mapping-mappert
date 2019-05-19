@@ -5,17 +5,17 @@ using NUnit.Framework;
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 
-namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
+namespace OffSync.Mapping.Mappert.Reflection.Tests
 {
     [TestFixture]
-    public class DynamicMethodMappingDelegateBuilderTest
+    public class ReflectionMappingDelegateBuilderTest
     {
-        private DynamicMethodMappingDelegateBuilder _sut;
+        private ReflectionMappingDelegateBuilder _sut;
 
         [SetUp]
         public void SetUp()
         {
-            _sut = new DynamicMethodMappingDelegateBuilder();
+            _sut = new ReflectionMappingDelegateBuilder();
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
 
             var target = new Target();
 
-            mappingDelegate(
+            mappingDelegate.DynamicInvoke(
                 source,
                 target);
 
@@ -76,7 +76,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
 
             var target = new Target();
 
-            mappingDelegate(
+            mappingDelegate.DynamicInvoke(
                 source,
                 target);
 
@@ -108,7 +108,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
 
             var target = new Target();
 
-            mappingDelegate(
+            mappingDelegate.DynamicInvoke(
                 source,
                 target);
 
@@ -152,7 +152,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
 
             var target = new Target();
 
-            mappingDelegate(
+            mappingDelegate.DynamicInvoke(
                 source,
                 target);
 

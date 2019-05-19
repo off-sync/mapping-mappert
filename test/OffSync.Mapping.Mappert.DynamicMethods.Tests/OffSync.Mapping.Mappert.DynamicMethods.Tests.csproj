@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert.DynamicMethods\OffSync.Mapping.Mappert.DynamicMethods.csproj" />
+    <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert\OffSync.Mapping.Mappert.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,8 @@
 ﻿using System;
 
-namespace OffSync.Mapping.Mappert.MappingRules
+using OffSync.Mapping.Mappert.MappingRules;
+
+namespace OffSync.Mapping.Mappert.MapperBuilders
 {
     public abstract class AbstractMappingRuleBuilder
     {
