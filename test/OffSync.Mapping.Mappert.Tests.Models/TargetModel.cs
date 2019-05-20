@@ -27,6 +27,8 @@ namespace OffSync.Mapping.Mappert.Tests.Models
         public int[] Numbers { get; set; }
 
         public ICollection<int> NumbersCollection { get; set; }
+
+        public Shared Shared { get; set; }
     }
 
     public class TargetNested

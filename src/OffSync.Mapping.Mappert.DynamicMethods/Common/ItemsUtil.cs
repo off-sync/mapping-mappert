@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OffSync.Mapping.Mappert.DynamicMethods.Common
 {
@@ -22,14 +23,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
 
             if (typeof(IEnumerable<T>).IsAssignableFrom(type))
             {
-                var count = 0;
-
-                foreach (var item in (IEnumerable<T>)value)
-                {
-                    count++;
-                }
-
-                return count;
+                return ((IEnumerable<T>)value).Count();
             }
 
             throw new ArgumentException(
@@ -37,9 +31,9 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
                 nameof(value));
         }
 
-        public static T[] FillArray<T>(
-            T[] array,
-            IEnumerable<T> items)
+        public static TTargetItems[] FillArray<TTargetItems>(
+            TTargetItems[] array,
+            IEnumerable<TTargetItems> items)
         {
             var i = 0;
 
@@ -51,10 +45,10 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
             return array;
         }
 
-        public static TTarget[] FillArrayWithBuilder<TSource, TTarget>(
-            TTarget[] array,
-            IEnumerable<TSource> items,
-            Func<TSource, TTarget> builder)
+        public static TTargetItems[] FillArrayWithBuilder<TSourceItems, TTargetItems>(
+            TTargetItems[] array,
+            IEnumerable<TSourceItems> items,
+            Func<TSourceItems, TTargetItems> builder)
         {
             var i = 0;
 
@@ -66,22 +60,23 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
             return array;
         }
 
-        public static object CreateCollection(
-            Type type,
-            Type itemsType)
+        public static TTarget CreateCollection<TTarget, TTargetItems>()
+            where TTarget : class, ICollection<TTargetItems>
         {
-            if (type.IsClass)
+            if (typeof(TTarget).IsClass)
             {
-                return Activator.CreateInstance(type);
+                return Activator.CreateInstance<TTarget>();
             }
 
-            return Activator.CreateInstance(
-                typeof(List<>).MakeGenericType(itemsType));
+            var collection = (ICollection<TTargetItems>)Activator.CreateInstance<List<TTargetItems>>();
+
+            return (TTarget)collection;
         }
 
-        public static ICollection<T> FillCollection<T>(
-            ICollection<T> collection,
-            IEnumerable<T> items)
+        public static T FillCollection<T, TItem>(
+            T collection,
+            IEnumerable<TItem> items)
+            where T : class, ICollection<TItem>
         {
             foreach (var item in items)
             {
@@ -91,10 +86,11 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
             return collection;
         }
 
-        public static ICollection<TTarget> FillCollectionWithBuilder<TSource, TTarget>(
-            ICollection<TTarget> collection,
-            IEnumerable<TSource> items,
-            Func<TSource, TTarget> builder)
+        public static TTarget FillCollectionWithBuilder<TTarget, TSourceItems, TTargetItems>(
+            TTarget collection,
+            IEnumerable<TSourceItems> items,
+            Func<TSourceItems, TTargetItems> builder)
+            where TTarget : class, ICollection<TTargetItems>
         {
             foreach (var item in items)
             {

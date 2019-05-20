@@ -45,11 +45,9 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         #endregion
 
         #region Internal state
-        private readonly GroboIL il; // FIXME rename
+        private readonly GroboIL _il;
 
-        private readonly GroboIL.Local froms;
-
-        private readonly GroboIL.Local value;
+        private readonly IDictionary<Type, GroboIL.Local> _typedLocals = new Dictionary<Type, GroboIL.Local>();
 
         private int builderIndex = 0;
         #endregion
@@ -57,22 +55,37 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         public DynamicMethodBuilder(
             DynamicMethod dynamicMethod)
         {
-            il = new GroboIL(dynamicMethod);
-
-            froms = il.DeclareLocal(
-                typeof(object[]),
-                nameof(froms));
-
-            value = il.DeclareLocal(
-                typeof(object),
-                nameof(value));
+            _il = new GroboIL(dynamicMethod);
         }
 
         public void Dispose()
         {
-            il.Ret();
+            _il.Ret();
 
-            il.Dispose();
+            _il.Dispose();
+
+#if DEBUG
+            System.Console.Out.WriteLine(_il.GetILCode());
+#endif
+        }
+
+        private GroboIL.Local GetSharedTypedLocal(
+            Type type)
+        {
+            if (_typedLocals.TryGetValue(
+                type,
+                out var local))
+            {
+                return local;
+            }
+
+            local = _il.DeclareLocal(
+                type,
+                type.Name);
+
+            _typedLocals[type] = local;
+
+            return local;
         }
 
         internal void AddMappingRule(
@@ -113,23 +126,13 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         private void AddDirectAssignment(
             IMappingRule mappingRule)
         {
-            il.Ldarg(TargetArg);
+            _il.Ldarg(TargetArg);
 
-            il.Ldarg(SourceArg);
+            _il.Ldarg(SourceArg);
 
-            il.Call(mappingRule.SourceProperties[0].GetMethod);
+            _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
-            if (mappingRule.SourceProperties[0].PropertyType.IsValueType)
-            {
-                il.Box(mappingRule.SourceProperties[0].PropertyType);
-            }
-
-            if (mappingRule.TargetProperties[0].PropertyType.IsValueType)
-            {
-                il.Unbox_Any(mappingRule.TargetProperties[0].PropertyType);
-            }
-
-            il.Call(mappingRule.TargetProperties[0].SetMethod);
+            _il.Call(mappingRule.TargetProperties[0].SetMethod);
         }
 
         private void AddApplyToValueBuilderAssignment(
@@ -137,49 +140,42 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         {
             var builderType = BuildersUtil.GetBuilderType(mappingRule);
 
-            il.Ldc_I4(mappingRule.SourceProperties.Count);
+            _il.Ldarg(BuildersArg);
 
-            il.Newarr(typeof(object));
+            _il.Ldc_I4(builderIndex);
 
-            il.Stloc(froms);
+            _il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
+
+            _il.Castclass(mappingRule
+                .Builder
+                .GetType());
 
             for (int i = 0; i < mappingRule.SourceProperties.Count; i++)
             {
-                il.Ldloc(froms);
+                _il.Ldarg(SourceArg);
 
-                il.Ldc_I4(i);
-
-                il.Ldarg(SourceArg);
-
-                il.Call(mappingRule.SourceProperties[i].GetMethod); // source.SourceProperty i
-
-                if (mappingRule.SourceProperties[i].PropertyType.IsValueType)
-                {
-                    // box the value type
-                    il.Box(mappingRule.SourceProperties[i].PropertyType);
-                }
-
-                il.Stelem(typeof(object)); // froms[i] =
+                _il.Call(mappingRule.SourceProperties[i].GetMethod);
             }
 
-            il.Ldarg(BuildersArg);
+            var types = mappingRule
+                .SourceProperties
+                .Select(pi => pi.PropertyType)
+                .ToArray();
 
-            il.Ldc_I4(builderIndex);
-
-            il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
-
-            il.Ldloc(froms);
-
-            il.Call(
-                typeof(Delegate)
+            _il.Call(
+                mappingRule
+                    .Builder
+                    .GetType()
                     .GetMethod(
-                        nameof(Delegate.DynamicInvoke), // FIXME change to invoke
-                        new Type[] { typeof(object[]) }));
+                        "Invoke",
+                        types));
 
             switch (builderType)
             {
                 case BuilderTypes.SingleValue:
-                    AddSingleValueAssignment(mappingRule.TargetProperties[0]);
+                    AddSingleValueAssignment(
+                        mappingRule.Builder.Method.ReturnType,
+                        mappingRule.TargetProperties[0]);
 
                     break;
 
@@ -198,188 +194,161 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         }
 
         private void AddSingleValueAssignment(
+            Type returnType,
             PropertyInfo targetProperty)
         {
-            il.Stloc(value);
+            var value = GetSharedTypedLocal(returnType);
 
-            il.Ldarg(TargetArg);
+            _il.Stloc(value);
 
-            il.Ldloc(value);
+            _il.Ldarg(TargetArg);
 
-            if (targetProperty.PropertyType.IsValueType)
-            {
-                il.Unbox_Any(targetProperty.PropertyType);
-            }
-            else
-            {
-                il.Castclass(targetProperty.PropertyType);
-            }
+            _il.Ldloc(value);
 
-            il.Call(targetProperty.SetMethod);
+            _il.Call(targetProperty.SetMethod);
         }
 
         private void AddValueTupleAssignment(
             Type returnType,
             PropertyInfo[] targetProperties)
         {
-            il.Unbox_Any(returnType);
+            var value = GetSharedTypedLocal(returnType);
 
-            var valueTuple = il.DeclareLocal( // FIXME use lookup of locals by type
-                returnType,
-                "valueTuple");
-
-            il.Stloc(valueTuple);
+            _il.Stloc(value);
 
             for (int i = 0; i < targetProperties.Length; i++)
             {
-                il.Ldarg(TargetArg);
+                _il.Ldarg(TargetArg);
 
-                il.Ldloca(valueTuple); // load by ref required for GetField
+                _il.Ldloca(value); // load by ref required for GetField on ValueTuple
 
-                il.Ldfld(returnType.GetField($"Item{i + 1}"));
+                _il.Ldfld(returnType.GetField($"Item{i + 1}"));
 
-                il.Call(targetProperties[i].SetMethod);
+                _il.Call(targetProperties[i].SetMethod);
             }
         }
 
         private void AddObjectArrayAssignment(
             PropertyInfo[] targetProperties)
         {
-            il.Stloc(value);
+            var value = GetSharedTypedLocal(typeof(object[]));
+
+            _il.Stloc(value);
 
             for (int i = 0; i < targetProperties.Length; i++)
             {
-                il.Ldarg(TargetArg);
+                _il.Ldarg(TargetArg);
 
-                il.Ldloc(value);
+                _il.Ldloc(value);
 
-                il.Castclass(typeof(object[]));
+                _il.Ldc_I4(i);
 
-                il.Ldc_I4(i);
-
-                il.Ldelem(typeof(object)); // value[i]
+                _il.Ldelem(typeof(object)); // value[i]
 
                 if (targetProperties[i].PropertyType.IsValueType)
                 {
-                    il.Unbox_Any(targetProperties[i].PropertyType);
+                    _il.Unbox_Any(targetProperties[i].PropertyType);
                 }
                 else
                 {
-                    il.Castclass(targetProperties[i].PropertyType);
+                    _il.Castclass(targetProperties[i].PropertyType);
                 }
 
-                il.Call(targetProperties[i].SetMethod);
+                _il.Call(targetProperties[i].SetMethod);
             }
         }
 
         private void AddApplyToArrayBuilderAssignment(
             IMappingRule mappingRule)
         {
-            il.Ldarg(TargetArg);
+            _il.Ldarg(TargetArg);
 
-            il.Ldarg(SourceArg);
+            _il.Ldarg(SourceArg);
 
-            il.Call(mappingRule.SourceProperties[0].GetMethod);
+            _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
-            il.Stloc(value);
+            var value = GetSharedTypedLocal(mappingRule.SourceProperties[0].PropertyType);
 
-            il.Ldloc(value);
+            _il.Stloc(value);
 
-            il.Call(GetItemsCount
+            _il.Ldloc(value);
+
+            _il.Call(GetItemsCount
                 .MakeGenericMethod(
                     mappingRule.SourceItemsType));
 
-            il.Newarr(mappingRule.TargetItemsType);
+            _il.Newarr(mappingRule.TargetItemsType);
 
-            il.Ldloc(value);
-
-            il.Castclass(
-                typeof(IEnumerable<>)
-                    .MakeGenericType(mappingRule.SourceItemsType));
+            _il.Ldloc(value);
 
             if (mappingRule.Builder == null)
             {
-                il.Call(FillArray
+                _il.Call(FillArray
                     .MakeGenericMethod(
                         mappingRule.SourceItemsType));
             }
             else
             {
-                il.Ldarg(BuildersArg);
+                _il.Ldarg(BuildersArg);
 
-                il.Ldc_I4(builderIndex);
+                _il.Ldc_I4(builderIndex);
 
-                il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
+                _il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
 
-                il.Castclass(
-                    typeof(Func<,>)
-                        .MakeGenericType(
-                            mappingRule.SourceItemsType,
-                            mappingRule.TargetItemsType));
+                _il.Castclass(mappingRule
+                    .Builder
+                    .GetType());
 
-                il.Call(FillArrayWithBuilder
+                _il.Call(FillArrayWithBuilder
                     .MakeGenericMethod(
                         mappingRule.SourceItemsType,
                         mappingRule.TargetItemsType));
             }
 
-            il.Call(mappingRule.TargetProperties[0].SetMethod);
+            _il.Call(mappingRule.TargetProperties[0].SetMethod);
         }
 
         private void AddApplyToCollectionBuilderAssignment(
             IMappingRule mappingRule)
         {
-            il.Ldarg(TargetArg);
+            _il.Ldarg(TargetArg);
 
-            il.Ldtoken(mappingRule.TargetProperties[0].PropertyType);
+            _il.Call(CreateCollection
+                .MakeGenericMethod(
+                    mappingRule.TargetProperties[0].PropertyType,
+                    mappingRule.TargetItemsType));
 
-            il.Call(GetTypeFromHandle);
+            _il.Ldarg(SourceArg);
 
-            il.Ldtoken(mappingRule.TargetItemsType);
-
-            il.Call(GetTypeFromHandle);
-
-            il.Call(CreateCollection);
-
-            il.Castclass(mappingRule.TargetProperties[0].PropertyType);
-
-            il.Ldarg(SourceArg);
-
-            il.Call(mappingRule.SourceProperties[0].GetMethod);
-
-            il.Castclass(
-                typeof(IEnumerable<>)
-                    .MakeGenericType(mappingRule.SourceItemsType));
+            _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
             if (mappingRule.Builder == null)
             {
-                il.Call(FillCollection
+                _il.Call(FillCollection
                     .MakeGenericMethod(
+                        mappingRule.TargetProperties[0].PropertyType,
                         mappingRule.SourceItemsType));
             }
             else
             {
-                il.Ldarg(BuildersArg);
+                _il.Ldarg(BuildersArg);
 
-                il.Ldc_I4(builderIndex);
+                _il.Ldc_I4(builderIndex);
 
-                il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
+                _il.Ldelem(typeof(Delegate)); // Builders[builderIndex]
 
-                il.Castclass(
-                    typeof(Func<,>)
-                        .MakeGenericType(
-                            mappingRule.SourceItemsType,
-                            mappingRule.TargetItemsType));
+                _il.Castclass(mappingRule
+                    .Builder
+                    .GetType());
 
-                il.Call(FillCollectionWithBuilder
+                _il.Call(FillCollectionWithBuilder
                     .MakeGenericMethod(
+                        mappingRule.TargetProperties[0].PropertyType,
                         mappingRule.SourceItemsType,
                         mappingRule.TargetItemsType));
             }
 
-            il.Castclass(mappingRule.TargetProperties[0].PropertyType);
-
-            il.Call(mappingRule.TargetProperties[0].SetMethod);
+            _il.Call(mappingRule.TargetProperties[0].SetMethod);
         }
     }
 }

@@ -21,6 +21,8 @@ namespace OffSync.Mapping.Mappert.Tests.Models
         public SourceNested[] ItemsArray { get; set; }
 
         public IReadOnlyList<int> Numbers { get; set; }
+
+        public SharedSub Shared { get; set; }
     }
 
     public class SourceNested

@@ -65,6 +65,11 @@ namespace OffSync.Mapping.Mappert.Tests
                 },
                 Numbers = new List<int>() { 16, 17 }.AsReadOnly(),
                 Ignored = true,
+                Shared = new SharedSub()
+                {
+                    Id = 16,
+                    Label = "17",
+                },
             };
 
             var target = sut.Map(source);
@@ -164,6 +169,14 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.Excluded,
                 Is.False);
+
+            Assert.That(
+                target.Shared,
+                Is.Not.Null);
+
+            Assert.That(
+                target.Shared.Id,
+                Is.EqualTo(16));
         }
 
         [Test]
