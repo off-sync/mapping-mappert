@@ -22,9 +22,6 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
         private const int BuildersArg = 2;
 
-        private static readonly MethodInfo GetTypeFromHandle = typeof(Type)
-            .GetMethod(nameof(Type.GetTypeFromHandle));
-
         private static readonly MethodInfo GetItemsCount = typeof(ItemsUtil)
             .GetMethod(nameof(ItemsUtil.GetItemsCount));
 
@@ -34,14 +31,17 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         private static readonly MethodInfo FillArrayWithBuilder = typeof(ItemsUtil)
             .GetMethod(nameof(ItemsUtil.FillArrayWithBuilder));
 
-        private static readonly MethodInfo CreateCollection = typeof(ItemsUtil)
-            .GetMethod(nameof(ItemsUtil.CreateCollection));
-
         private static readonly MethodInfo FillCollection = typeof(ItemsUtil)
             .GetMethod(nameof(ItemsUtil.FillCollection));
 
         private static readonly MethodInfo FillCollectionWithBuilder = typeof(ItemsUtil)
             .GetMethod(nameof(ItemsUtil.FillCollectionWithBuilder));
+
+        private static readonly MethodInfo FillList = typeof(ItemsUtil)
+            .GetMethod(nameof(ItemsUtil.FillList));
+
+        private static readonly MethodInfo FillListWithBuilder = typeof(ItemsUtil)
+            .GetMethod(nameof(ItemsUtil.FillListWithBuilder));
         #endregion
 
         #region Internal state
@@ -313,23 +313,63 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         {
             _il.Ldarg(TargetArg);
 
-            _il.Call(CreateCollection
-                .MakeGenericMethod(
-                    mappingRule.TargetProperties[0].PropertyType,
-                    mappingRule.TargetItemsType));
+            ConstructorInfo constructor;
+
+            MethodInfo fillMethod;
+
+            if (mappingRule.TargetProperties[0].PropertyType.IsClass)
+            {
+                // use concrete class
+                constructor = mappingRule
+                    .TargetProperties[0]
+                    .PropertyType
+                    .GetConstructor(Type.EmptyTypes);
+
+                if (mappingRule.Builder == null)
+                {
+                    fillMethod = FillCollection
+                        .MakeGenericMethod(
+                            mappingRule.TargetProperties[0].PropertyType,
+                            mappingRule.SourceItemsType);
+                }
+                else
+                {
+                    fillMethod = FillCollectionWithBuilder
+                        .MakeGenericMethod(
+                            mappingRule.TargetProperties[0].PropertyType,
+                            mappingRule.SourceItemsType,
+                            mappingRule.TargetItemsType);
+                }
+            }
+            else
+            {
+                // use a generic list
+                constructor = typeof(List<>)
+                    .MakeGenericType(mappingRule.TargetItemsType)
+                    .GetConstructor(Type.EmptyTypes);
+
+                if (mappingRule.Builder == null)
+                {
+                    fillMethod = FillList
+                        .MakeGenericMethod(
+                            mappingRule.SourceItemsType);
+                }
+                else
+                {
+                    fillMethod = FillListWithBuilder
+                        .MakeGenericMethod(
+                            mappingRule.SourceItemsType,
+                            mappingRule.TargetItemsType);
+                }
+            }
+
+            _il.Newobj(constructor);
 
             _il.Ldarg(SourceArg);
 
             _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
-            if (mappingRule.Builder == null)
-            {
-                _il.Call(FillCollection
-                    .MakeGenericMethod(
-                        mappingRule.TargetProperties[0].PropertyType,
-                        mappingRule.SourceItemsType));
-            }
-            else
+            if (mappingRule.Builder != null)
             {
                 _il.Ldarg(BuildersArg);
 
@@ -340,13 +380,9 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                 _il.Castclass(mappingRule
                     .Builder
                     .GetType());
-
-                _il.Call(FillCollectionWithBuilder
-                    .MakeGenericMethod(
-                        mappingRule.TargetProperties[0].PropertyType,
-                        mappingRule.SourceItemsType,
-                        mappingRule.TargetItemsType));
             }
+
+            _il.Call(fillMethod);
 
             _il.Call(mappingRule.TargetProperties[0].SetMethod);
         }

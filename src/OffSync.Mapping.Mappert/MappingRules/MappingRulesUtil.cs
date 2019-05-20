@@ -347,12 +347,6 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
             var targetType = targetProperty.PropertyType;
 
-            if (targetType.IsAssignableFrom(sourceType))
-            {
-                // properties have assignable types: no builder required
-                return mappingRule;
-            }
-
             // check if both properties have items
             if (sourceType.TryGetSourceItemsType(out var sourceItemsType) &&
                 targetType.TryGetTargetItemsType(out var targetItemsType))
@@ -367,12 +361,12 @@ namespace OffSync.Mapping.Mappert.MappingRules
                 sourceType = sourceItemsType;
 
                 targetType = targetItemsType;
+            }
 
-                if (targetType.IsAssignableFrom(sourceType))
-                {
-                    // items have assignable types: no builder required
-                    return mappingRule;
-                }
+            if (targetType.IsAssignableFrom(sourceType))
+            {
+                // properties/items have assignable types: no builder required
+                return mappingRule;
             }
 
             // create auto-mapper

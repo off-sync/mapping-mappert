@@ -29,6 +29,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)),
                 },
                 Builder = builder,
+                BuilderInvoke = GetBuilderInvoke(builder),
                 BuilderType = BuilderTypes.ObjectArray,
             };
 
@@ -74,6 +75,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                     typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)),
                 },
                 Builder = builder,
+                BuilderInvoke = GetBuilderInvoke(builder),
                 BuilderType = BuilderTypes.ObjectArray,
             };
 
@@ -108,6 +110,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 TargetItemType = typeof(TargetNested),
                 MappingRuleType = MappingRuleTypes.MapToArray,
                 Builder = builder,
+                BuilderInvoke = GetBuilderInvoke(builder),
                 BuilderType = BuilderTypes.ObjectArray,
             };
 
@@ -150,5 +153,21 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 target.ItemsArray[1].Value,
                 Is.EqualTo("4"));
         }
+
+        #region Helpers
+        private MethodInfo GetBuilderInvoke(
+            Delegate builder)
+        {
+            return builder
+                .GetType()
+                .GetMethod(
+                    "Invoke",
+                    builder
+                        .Method
+                        .GetParameters()
+                        .Select(pi => pi.ParameterType)
+                        .ToArray());
+        }
+        #endregion
     }
 }

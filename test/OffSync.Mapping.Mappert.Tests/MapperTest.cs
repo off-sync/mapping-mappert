@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -70,6 +71,15 @@ namespace OffSync.Mapping.Mappert.Tests
                     Id = 16,
                     Label = "17",
                 },
+                MoreItems = Enumerable
+                    .Range(18, 2)
+                    .Select(i =>
+                        new SourceNested()
+                        {
+                            Key = i,
+                            Value = i.ToString(),
+                        })
+                    .OrderByDescending(sn => sn.Key),
             };
 
             var target = sut.Map(source);
@@ -177,6 +187,26 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.Shared.Id,
                 Is.EqualTo(16));
+
+            Assert.That(
+                target.MoreItems,
+                Has.Exactly(2).Items);
+
+            Assert.That(
+                target.MoreItems.First().Key,
+                Is.EqualTo(19));
+
+            Assert.That(
+                target.MoreItems.First().Value,
+                Is.EqualTo("19"));
+
+            Assert.That(
+                target.MoreItems.Skip(1).First().Key,
+                Is.EqualTo(18));
+
+            Assert.That(
+                target.MoreItems.Skip(1).First().Value,
+                Is.EqualTo("18"));
         }
 
         [Test]

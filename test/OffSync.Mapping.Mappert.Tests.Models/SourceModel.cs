@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace OffSync.Mapping.Mappert.Tests.Models
 {
@@ -23,6 +24,8 @@ namespace OffSync.Mapping.Mappert.Tests.Models
         public IReadOnlyList<int> Numbers { get; set; }
 
         public SharedSub Shared { get; set; }
+
+        public IOrderedEnumerable<SourceNested> MoreItems { get; set; }
     }
 
     public class SourceNested

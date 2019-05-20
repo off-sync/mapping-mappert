@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -262,6 +263,8 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
             public SourceNested[] ItemsList { get; set; }
 
             public int[] Numbers { get; set; }
+
+            public IEnumerable<SourceNested> MoreItems { get; set; }
         }
 
         [Test]
@@ -272,6 +275,9 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
             MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
                 typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)));
+
+            MappingRulesUtil.CreateAutoMapping<CreateAutoMappingModel>(
+                typeof(TargetModel).GetProperty(nameof(TargetModel.MoreItems)));
         }
     }
 }

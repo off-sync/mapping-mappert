@@ -60,19 +60,6 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
             return array;
         }
 
-        public static TTarget CreateCollection<TTarget, TTargetItems>()
-            where TTarget : class, ICollection<TTargetItems>
-        {
-            if (typeof(TTarget).IsClass)
-            {
-                return Activator.CreateInstance<TTarget>();
-            }
-
-            var collection = (ICollection<TTargetItems>)Activator.CreateInstance<List<TTargetItems>>();
-
-            return (TTarget)collection;
-        }
-
         public static T FillCollection<T, TItem>(
             T collection,
             IEnumerable<TItem> items)
@@ -99,6 +86,32 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
             }
 
             return collection;
+        }
+
+        public static List<TItem> FillList<TItem>(
+            List<TItem> list,
+            IEnumerable<TItem> items)
+        {
+            foreach (var item in items)
+            {
+                list.Add(item);
+            }
+
+            return list;
+        }
+
+        public static List<TTargetItems> FillListWithBuilder<TSourceItems, TTargetItems>(
+            List<TTargetItems> list,
+            IEnumerable<TSourceItems> items,
+            Func<TSourceItems, TTargetItems> builder)
+        {
+            foreach (var item in items)
+            {
+                list.Add(
+                    builder(item));
+            }
+
+            return list;
         }
     }
 }
