@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 using OffSync.Mapping.Mappert.Reflection.MappingSteps;
 
 namespace OffSync.Mapping.Mappert.Reflection
@@ -8,16 +7,9 @@ namespace OffSync.Mapping.Mappert.Reflection
     {
         private readonly MappingStep[] _mappingSteps;
 
-        public ReflectionMappingDelegate(MappingStep[] mappingSteps)
+        internal ReflectionMappingDelegate(MappingStep[] mappingSteps)
         {
-            #region Pre-conditions
-            if (mappingSteps == null)
-            {
-                throw new ArgumentNullException(nameof(mappingSteps));
-            }
-            #endregion
-
-            this._mappingSteps = mappingSteps;
+            _mappingSteps = mappingSteps;
         }
 
         internal void Map(

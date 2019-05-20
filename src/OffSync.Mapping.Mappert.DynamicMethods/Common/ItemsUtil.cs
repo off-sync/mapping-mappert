@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace OffSync.Mapping.Mappert.DynamicMethods.Common
 {
     public static class ItemsUtil
     {
-        public static int GetItemsCount(
+        public static int GetItemsCount<T>(
             object value)
         {
             var type = value.GetType();
@@ -16,16 +15,16 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
                 return ((Array)value).Length;
             }
 
-            if (typeof(ICollection).IsAssignableFrom(type))
+            if (typeof(ICollection<T>).IsAssignableFrom(type))
             {
-                return ((ICollection)value).Count;
+                return ((ICollection<T>)value).Count;
             }
 
-            if (typeof(IEnumerable).IsAssignableFrom(type))
+            if (typeof(IEnumerable<T>).IsAssignableFrom(type))
             {
                 var count = 0;
 
-                foreach (var item in (IEnumerable)value)
+                foreach (var item in (IEnumerable<T>)value)
                 {
                     count++;
                 }

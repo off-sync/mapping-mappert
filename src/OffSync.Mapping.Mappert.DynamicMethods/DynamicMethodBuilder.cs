@@ -78,15 +78,6 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
         internal void AddMappingRule(
             IMappingRule mappingRule)
         {
-            if (mappingRule.Builder == null &&
-                (mappingRule.SourceProperties.Count != 1 ||
-                mappingRule.TargetProperties.Count != 1))
-            {
-                throw new ArgumentException(
-                    $"no builder provided, exactly one source and target property must be provided",
-                    nameof(mappingRule));
-            }
-
             switch (mappingRule.Type)
             {
                 case MappingRuleTypes.MapToValue:
@@ -294,7 +285,9 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
             il.Ldloc(value);
 
-            il.Call(GetItemsCount);
+            il.Call(GetItemsCount
+                .MakeGenericMethod(
+                    mappingRule.SourceItemsType));
 
             il.Newarr(mappingRule.TargetItemsType);
 

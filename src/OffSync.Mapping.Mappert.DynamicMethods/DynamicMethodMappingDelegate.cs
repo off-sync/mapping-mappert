@@ -8,22 +8,10 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
         private readonly Delegate[] _builders;
 
-        public DynamicMethodMappingDelegate(
+        internal DynamicMethodMappingDelegate(
             MapDelegate<TSource, TTarget> mapDelegate,
             Delegate[] builders)
         {
-            #region Pre-conditions
-            if (mapDelegate == null)
-            {
-                throw new ArgumentNullException(nameof(mapDelegate));
-            }
-
-            if (builders == null)
-            {
-                throw new ArgumentNullException(nameof(builders));
-            }
-            #endregion
-
             _mapDelegate = mapDelegate;
 
             _builders = builders;

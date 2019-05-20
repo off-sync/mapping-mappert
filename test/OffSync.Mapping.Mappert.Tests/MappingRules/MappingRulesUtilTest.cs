@@ -40,6 +40,8 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
                     b.MapItems(s => s.ItemsArray)
                         .To(t => t.ItemsList);
+
+                    b.IgnoreTarget(t => t.NumbersCollection);
                 });
 
             Assert.That(
@@ -77,6 +79,8 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
                     b.MapItems(s => s.ItemsArray)
                         .To(t => t.ItemsList);
+
+                    b.IgnoreTarget(t => t.NumbersCollection);
                 });
 
             Assert.That(
@@ -116,6 +120,8 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
                     b.MapItems(s => s.ItemsArray)
                         .To(t => t.ItemsList);
+
+                    b.IgnoreTarget(t => t.NumbersCollection);
                 });
 
             Assert.That(
@@ -138,9 +144,20 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 checkedRule.Builder,
                 Is.Not.Null);
 
+            // should throw exception if auto-mapping is not possible
             rule = new MappingRule()
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Description)));
+
+            Assert.That(
+                () => MappingRulesUtil.WithAutoMappingBuilders(rule.Yield()),
+                Throws.InvalidOperationException);
+
+            // should throw exception if auto-mapping is not possible for items
+            rule = new MappingRule()
+                .WithSourceItems(typeof(SourceModel).GetProperty(nameof(SourceModel.ItemsArray)), typeof(SourceNested))
+                .WithTargetItems(typeof(TargetModel).GetProperty(nameof(TargetModel.Numbers)), typeof(int))
+                .WithType(MappingRuleTypes.MapToArray);
 
             Assert.That(
                 () => MappingRulesUtil.WithAutoMappingBuilders(rule.Yield()),
@@ -150,10 +167,44 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
         [Test]
         public void EnsureValidBuildersChecksBuildersForMultiPropertyMappings()
         {
+            // multiple target properties require a builder
             var rule = new MappingRule()
                 .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
                 .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)));
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),
+                Throws.InvalidOperationException);
+
+            // multiple source properties require a builder
+            rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Name)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)));
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),
+                Throws.InvalidOperationException);
+
+            // multiple source and target properties require a builder
+            rule = new MappingRule()
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Name)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2)));
+
+            Assert.That(
+                () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),
+                Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void EnsureValidBuildersChecksBuildersForTargetPropertyOnlyMappings()
+        {
+            // multiple target properties require a builder
+            var rule = new MappingRule()
+                .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)));
 
             Assert.That(
                 () => MappingRulesUtil.EnsureValidBuilders(rule.Yield()),

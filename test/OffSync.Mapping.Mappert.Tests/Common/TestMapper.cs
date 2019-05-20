@@ -1,6 +1,7 @@
 ﻿using System;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
+using OffSync.Mapping.Mappert.Practises;
 using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests.Common
@@ -21,10 +22,10 @@ namespace OffSync.Mapping.Mappert.Tests.Common
     {
         private readonly ILookupService _lookupService = new ParsingLookupService();
 
-        public TestMapper()
+        public TestMapper(
+            IMappingDelegateBuilder mappingDelegateBuilder)
         {
-            // FIXME
-            //WithMappingDelegateBuilder(new DynamicMethodMappingDelegateBuilder());
+            WithMappingDelegateBuilder(mappingDelegateBuilder);
 
             Map(s => s.Name)
                 .To(t => t.Description);
@@ -49,6 +50,9 @@ namespace OffSync.Mapping.Mappert.Tests.Common
 
             MapItems(s => s.ItemsArray)
                 .To(t => t.ItemsList);
+
+            MapItems(s => s.Numbers)
+                .To(t => t.NumbersCollection);
         }
 
         public TestMapper(

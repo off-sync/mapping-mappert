@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 
 using OffSync.Mapping.Mappert.Practises;
@@ -17,6 +18,16 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
             if (mappingRules == null)
             {
                 throw new ArgumentNullException(nameof(mappingRules));
+            }
+
+            if (mappingRules.Any(
+                r => r.Builder == null &&
+                (r.SourceProperties.Count != 1 ||
+                r.TargetProperties.Count != 1)))
+            {
+                throw new ArgumentException(
+                    $"a builder must be present for every multi property mapping rule",
+                    nameof(mappingRules));
             }
             #endregion
 

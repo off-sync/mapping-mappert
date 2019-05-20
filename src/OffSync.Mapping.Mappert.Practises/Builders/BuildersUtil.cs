@@ -16,8 +16,7 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
                 throw new ArgumentNullException(nameof(mappingRule));
             }
 
-            if (mappingRule.TargetProperties == null ||
-                mappingRule.TargetProperties.Count == 0)
+            if (mappingRule.TargetProperties.Count == 0)
             {
                 throw new ArgumentException(
                     $"{nameof(mappingRule.TargetProperties)} must contain at least one element",

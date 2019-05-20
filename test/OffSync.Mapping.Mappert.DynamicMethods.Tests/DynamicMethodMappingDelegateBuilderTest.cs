@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
 {
@@ -22,7 +23,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
         public void CreateMappingDelegateShouldCheckPreConditions()
         {
             Assert.That(
-                () => _sut.CreateMappingDelegate<Source, Target>(null),
+                () => _sut.CreateMappingDelegate<SourceModel, TargetModel>(null),
                 Throws.ArgumentNullException);
         }
 
@@ -32,18 +33,18 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
             var mappingRules = new IMappingRule[]
             {
                 new MappingRule()
-                    .WithSource(typeof(Source).GetProperty(nameof(Source.Id)))
-                    .WithTarget(typeof(Target).GetProperty(nameof(Target.Id))),
+                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id))),
             };
 
-            var mappingDelegate = _sut.CreateMappingDelegate<Source, Target>(mappingRules);
+            var mappingDelegate = _sut.CreateMappingDelegate<SourceModel, TargetModel>(mappingRules);
 
-            var source = new Source()
+            var source = new SourceModel()
             {
                 Id = 1,
             };
 
-            var target = new Target();
+            var target = new TargetModel();
 
             mappingDelegate(
                 source,
@@ -62,19 +63,19 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
             var mappingRules = new IMappingRule[]
             {
                 new MappingRule()
-                    .WithSource(typeof(Source).GetProperty(nameof(Source.Id)))
-                    .WithTarget(typeof(Target).GetProperty(nameof(Target.Id)))
+                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Id)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
                     .WithBuilder(builder),
             };
 
-            var mappingDelegate = _sut.CreateMappingDelegate<Source, Target>(mappingRules);
+            var mappingDelegate = _sut.CreateMappingDelegate<SourceModel, TargetModel>(mappingRules);
 
-            var source = new Source()
+            var source = new SourceModel()
             {
                 Id = 1,
             };
 
-            var target = new Target();
+            var target = new TargetModel();
 
             mappingDelegate(
                 source,
@@ -93,20 +94,20 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
             var mappingRules = new IMappingRule[]
             {
                 new MappingRule()
-                    .WithSource(typeof(Source).GetProperty(nameof(Source.Values)))
-                    .WithTarget(typeof(Target).GetProperty(nameof(Target.Id)))
-                    .WithTarget(typeof(Target).GetProperty(nameof(Target.Value1)))
+                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
                     .WithBuilder(builder),
             };
 
-            var mappingDelegate = _sut.CreateMappingDelegate<Source, Target>(mappingRules);
+            var mappingDelegate = _sut.CreateMappingDelegate<SourceModel, TargetModel>(mappingRules);
 
-            var source = new Source()
+            var source = new SourceModel()
             {
                 Values = "1,2",
             };
 
-            var target = new Target();
+            var target = new TargetModel();
 
             mappingDelegate(
                 source,
@@ -137,20 +138,20 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
             var mappingRules = new IMappingRule[]
             {
                 new MappingRule()
-                    .WithSource(typeof(Source).GetProperty(nameof(Source.Values)))
-                    .WithTarget(typeof(Target).GetProperty(nameof(Target.Id)))
-                    .WithTarget(typeof(Target).GetProperty(nameof(Target.Value1)))
+                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Id)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
                     .WithBuilder(builder),
             };
 
-            var mappingDelegate = _sut.CreateMappingDelegate<Source, Target>(mappingRules);
+            var mappingDelegate = _sut.CreateMappingDelegate<SourceModel, TargetModel>(mappingRules);
 
-            var source = new Source()
+            var source = new SourceModel()
             {
                 Values = "1,2",
             };
 
-            var target = new Target();
+            var target = new TargetModel();
 
             mappingDelegate(
                 source,
@@ -176,6 +177,22 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
                     int.Parse(splitted[0]),
                     splitted[1],
                 };
+        }
+
+        [Test]
+        public void CreateMappingDelegateShouldThrowOnMissingBuilder()
+        {
+            var mappingRules = new IMappingRule[]
+            {
+                new MappingRule()
+                    .WithSource(typeof(SourceModel).GetProperty(nameof(SourceModel.Values)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value1)))
+                    .WithTarget(typeof(TargetModel).GetProperty(nameof(TargetModel.Value2))),
+            };
+
+            Assert.That(
+                () => _sut.CreateMappingDelegate<SourceModel, TargetModel>(mappingRules),
+                Throws.ArgumentException);
         }
     }
 }

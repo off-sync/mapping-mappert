@@ -1,4 +1,6 @@
-﻿namespace OffSync.Mapping.Mappert.Benchmarks
+﻿using OffSync.Mapping.Mappert.Practises;
+
+namespace OffSync.Mapping.Mappert.Benchmarks
 {
     public class ArraySplitterSourceModel
     {
@@ -15,8 +17,11 @@
     public class ArraySplitterMapper :
         Mapper<ArraySplitterSourceModel, ArraySplitterTargetModel>
     {
-        public ArraySplitterMapper()
+        public ArraySplitterMapper(
+            IMappingDelegateBuilder mappingDelegateBuilder)
         {
+            WithMappingDelegateBuilder(mappingDelegateBuilder);
+
             Map(s => s.Values)
                 .To(t => t.Value1, t => t.Value2)
                 .Using(StringArraySplitter);

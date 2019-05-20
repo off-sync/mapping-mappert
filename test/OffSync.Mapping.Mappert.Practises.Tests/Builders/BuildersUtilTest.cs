@@ -15,6 +15,10 @@ namespace OffSync.Mapping.Mappert.Practises.Tests.Builders
         [Test]
         public void GetBuilderTypeShouldCheckPreConditions()
         {
+            Assert.That(
+                () => BuildersUtil.GetBuilderType(null),
+                Throws.ArgumentNullException);
+
             var sourceProperty = typeof(SourceModel).GetProperty(nameof(SourceModel.Id));
 
             var targetProperty = typeof(TargetModel).GetProperty(nameof(TargetModel.Id));

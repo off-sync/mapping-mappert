@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -13,37 +12,14 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
         private readonly List<PropertyInfo> _targetProperties = new List<PropertyInfo>();
 
-        public override bool Equals(object obj)
-        {
-            return obj is MappingRule rule &&
-                EqualityComparer<List<PropertyInfo>>.Default.Equals(_sourceProperties, rule._sourceProperties) &&
-                EqualityComparer<Type>.Default.Equals(SourceItemsType, rule.SourceItemsType) &&
-                EqualityComparer<List<PropertyInfo>>.Default.Equals(_targetProperties, rule._targetProperties) &&
-                EqualityComparer<Type>.Default.Equals(TargetItemsType, rule.TargetItemsType) &&
-                EqualityComparer<Delegate>.Default.Equals(Builder, rule.Builder) &&
-                Type == rule.Type;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 1528579089;
-            hashCode = hashCode * -1521134295 + EqualityComparer<List<PropertyInfo>>.Default.GetHashCode(_sourceProperties);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Type>.Default.GetHashCode(SourceItemsType);
-            hashCode = hashCode * -1521134295 + EqualityComparer<List<PropertyInfo>>.Default.GetHashCode(_targetProperties);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Type>.Default.GetHashCode(TargetItemsType);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Delegate>.Default.GetHashCode(Builder);
-            hashCode = hashCode * -1521134295 + Type.GetHashCode();
-            return hashCode;
-        }
-
         public override string ToString()
         {
             var sourceNames = string.Join(
-                ", ",
+                "', '",
                 _sourceProperties.Select(pi => pi.Name));
 
             var targetNames = string.Join(
-                ", ",
+                "', '",
                 _targetProperties.Select(pi => pi.Name));
 
             var builderIndication = Builder == null ? "" : "*";

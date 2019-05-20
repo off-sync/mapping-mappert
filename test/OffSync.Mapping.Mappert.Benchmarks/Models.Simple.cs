@@ -1,4 +1,6 @@
-﻿namespace OffSync.Mapping.Mappert.Benchmarks
+﻿using OffSync.Mapping.Mappert.Practises;
+
+namespace OffSync.Mapping.Mappert.Benchmarks
 {
     public class SimpleSourceModel
     {
@@ -21,8 +23,11 @@
     public class SimpleMapper :
         Mapper<SimpleSourceModel, SimpleTargetModel>
     {
-        public SimpleMapper()
+        public SimpleMapper(
+            IMappingDelegateBuilder mappingDelegateBuilder)
         {
+            WithMappingDelegateBuilder(mappingDelegateBuilder);
+
             Map(s => s.Name)
                 .To(t => t.Description);
 

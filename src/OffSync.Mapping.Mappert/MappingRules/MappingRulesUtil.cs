@@ -154,9 +154,9 @@ namespace OffSync.Mapping.Mappert.MappingRules
                             }
 
                             // create auto-mapper for items
-                            if (!Util.Try(() => MappersUtil.CreateAutoMapper(
+                            if (!MappersUtil.TryCreateAutoMapper(
                                 rules[i].SourceItemsType,
-                                rules[i].TargetItemsType),
+                                rules[i].TargetItemsType,
                                 out mapper,
                                 out exception))
                             {
@@ -176,9 +176,9 @@ namespace OffSync.Mapping.Mappert.MappingRules
                             }
 
                             // create auto-mapper for properties
-                            if (!Util.Try(() => MappersUtil.CreateAutoMapper(
+                            if (!MappersUtil.TryCreateAutoMapper(
                                 rules[i].SourceProperties[0].PropertyType,
-                                rules[i].TargetProperties[0].PropertyType),
+                                rules[i].TargetProperties[0].PropertyType,
                                 out mapper,
                                 out exception))
                             {
@@ -191,16 +191,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
                     }
 
                     // create builder from mapper
-                    if (!Util.Try(() => MappersUtil.CreateMapperDelegate(
-                        mapper),
-                        out var builder,
-                        out exception
-                        ))
-                    {
-                        throw new InvalidOperationException(
-                            $"unable to create auto-mapper delegate for ['{rules[i]}']",
-                            exception);
-                    }
+                    var builder = MappersUtil.CreateMapperDelegate(mapper);
 
                     // create new mapping rule with builder
                     var rule = new MappingRule()
