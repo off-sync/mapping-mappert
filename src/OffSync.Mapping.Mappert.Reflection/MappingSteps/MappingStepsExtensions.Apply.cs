@@ -63,8 +63,10 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                     .ToArray();
 
                 value = mappingStep
-                    .Builder
-                    .DynamicInvoke(froms);
+                    .BuilderInvoke
+                    .Invoke(
+                        mappingStep.Builder,
+                        froms);
             }
 
             switch (mappingStep.BuilderType)
@@ -184,8 +186,10 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
             var froms = new object[] { sourceItem };
 
             return mappingStep
-                .Builder
-                .DynamicInvoke(froms);
+                .BuilderInvoke
+                .Invoke(
+                    mappingStep.Builder,
+                    froms);
         }
 
         private static void ApplyFromValueTuple<TTarget>(

@@ -16,6 +16,8 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
 
         public Delegate Builder { get; set; }
 
+        public MethodInfo BuilderInvoke { get; set; }
+
         public BuilderTypes BuilderType { get; set; }
 
         public FieldInfo[] ValueTupleFields { get; set; }

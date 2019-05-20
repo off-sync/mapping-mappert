@@ -29,6 +29,25 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                     .ToArray();
             }
 
+            MethodInfo builderInvoke = null;
+
+            if (mappingRule.Builder != null)
+            {
+                var paramTypes = mappingRule
+                    .Builder
+                    .Method
+                    .GetParameters()
+                    .Select(pi => pi.ParameterType)
+                    .ToArray();
+
+                builderInvoke = mappingRule
+                    .Builder
+                    .GetType()
+                    .GetMethod(
+                        "Invoke",
+                        paramTypes);
+            }
+
             return new MappingStep()
             {
                 SourceProperties = mappingRule.SourceProperties.ToArray(),
@@ -36,6 +55,7 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                 TargetItemType = mappingRule.TargetItemsType,
                 MappingRuleType = mappingRule.Type,
                 Builder = mappingRule.Builder,
+                BuilderInvoke = builderInvoke,
                 BuilderType = builderType,
                 ValueTupleFields = valueTupleFields,
             };

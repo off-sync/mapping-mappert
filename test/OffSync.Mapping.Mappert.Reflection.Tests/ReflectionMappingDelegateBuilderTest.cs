@@ -46,7 +46,7 @@ namespace OffSync.Mapping.Mappert.Reflection.Tests
 
             var target = new TargetModel();
 
-            mappingDelegate.DynamicInvoke(
+            mappingDelegate(
                 source,
                 target);
 
@@ -77,7 +77,7 @@ namespace OffSync.Mapping.Mappert.Reflection.Tests
 
             var target = new TargetModel();
 
-            mappingDelegate.DynamicInvoke(
+            mappingDelegate(
                 source,
                 target);
 
@@ -109,7 +109,7 @@ namespace OffSync.Mapping.Mappert.Reflection.Tests
 
             var target = new TargetModel();
 
-            mappingDelegate.DynamicInvoke(
+            mappingDelegate(
                 source,
                 target);
 
@@ -153,7 +153,7 @@ namespace OffSync.Mapping.Mappert.Reflection.Tests
 
             var target = new TargetModel();
 
-            mappingDelegate.DynamicInvoke(
+            mappingDelegate(
                 source,
                 target);
 
