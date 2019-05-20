@@ -1,4 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="SonarQube - mapping-mappert Sonar way" ToolsVersion="16.0">
-  <Include Path="..\..\.sonarlint\off-sync_mapping-mappertcsharp.ruleset" Action="Default" />
-</RuleSet>

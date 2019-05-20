@@ -5,14 +5,6 @@
     <Version>0.1.0</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj" />
     <ProjectReference Include="..\OffSync.Mapping.Mappert.Practises\OffSync.Mapping.Mappert.Practises.csproj" />
