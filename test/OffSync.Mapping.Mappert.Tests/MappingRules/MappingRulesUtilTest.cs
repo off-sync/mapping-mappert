@@ -7,6 +7,7 @@ using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Tests.Common;
 using OffSync.Mapping.Mappert.Tests.Models;
+using OffSync.Mapping.Mappert.Validation.Exceptions;
 
 namespace OffSync.Mapping.Mappert.Tests.MappingRules
 {
@@ -53,7 +54,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
             Assert.That(
                 () => builder.Map(null),
-                Throws.InvalidOperationException);
+                Throws.TypeOf<MappingRuleSetValidationException>());
         }
 
         [Test]
@@ -98,7 +99,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
             Assert.That(
                 () => builder.Map(null),
-                Throws.InvalidOperationException);
+                Throws.TypeOf<MappingRuleSetValidationException>());
         }
 
         [Test]
@@ -145,7 +146,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
 
             Assert.That(
                 () => builder.Map(null),
-                Throws.InvalidOperationException);
+                Throws.TypeOf<MappingRuleSetValidationException>());
         }
 
         [Test]

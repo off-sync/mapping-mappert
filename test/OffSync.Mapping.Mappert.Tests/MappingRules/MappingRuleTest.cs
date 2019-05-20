@@ -9,7 +9,7 @@ using OffSync.Mapping.Mappert.Tests.Models;
 namespace OffSync.Mapping.Mappert.Tests.MappingRules
 {
     [TestFixture]
-    public class MappingRuleTest
+    public partial class MappingRuleTest
     {
         private MappingRule sut;
 

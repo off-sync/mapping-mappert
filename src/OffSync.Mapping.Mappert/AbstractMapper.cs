@@ -24,7 +24,7 @@ namespace OffSync.Mapping.Mappert
         public TTarget Map(
             TSource source)
         {
-            var mappingDelegate = GetCheckedMappingDelegate();
+            var mappingDelegate = GetValidatedMappingDelegate();
 
             if (source == null)
             {
