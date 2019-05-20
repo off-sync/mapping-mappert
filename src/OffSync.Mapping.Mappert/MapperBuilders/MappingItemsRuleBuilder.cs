@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
@@ -19,8 +20,10 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             Expression<Func<TTarget, ICollection<TTo>>> to)
         {
             _mappingRule
-                .WithTarget(to, typeof(TTo))
-                .WithStrategy(MappingStrategies.MapToCollection);
+                .WithTargetItems(
+                    to,
+                    typeof(TTo))
+                .WithType(MappingRuleTypes.MapToCollection);
 
             return new MappingRuleBuilderFrom1To1<TFrom, TTo>(_mappingRule);
         }
@@ -29,8 +32,10 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             Expression<Func<TTarget, TTo[]>> to)
         {
             _mappingRule
-                .WithTarget(to, typeof(TTo))
-                .WithStrategy(MappingStrategies.MapToArray);
+                .WithTargetItems(
+                    to,
+                    typeof(TTo))
+                .WithType(MappingRuleTypes.MapToArray);
 
             return new MappingRuleBuilderFrom1To1<TFrom, TTo>(_mappingRule);
         }

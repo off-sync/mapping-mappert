@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.Common;
+using OffSync.Mapping.Mappert.Tests.Models;
 using OffSync.Mapping.Practises;
 
 namespace OffSync.Mapping.Mappert.Tests.Common

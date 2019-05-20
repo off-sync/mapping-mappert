@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
-using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests.Common
 {
@@ -22,8 +22,11 @@ namespace OffSync.Mapping.Mappert.Tests.Common
     {
         private readonly ILookupService _lookupService = new ParsingLookupService();
 
-        public TestMapper()
+        public TestMapper(
+            IMappingDelegateBuilder mappingDelegateBuilder)
         {
+            WithMappingDelegateBuilder(mappingDelegateBuilder);
+
             Map(s => s.Name)
                 .To(t => t.Description);
 
@@ -47,6 +50,15 @@ namespace OffSync.Mapping.Mappert.Tests.Common
 
             MapItems(s => s.ItemsArray)
                 .To(t => t.ItemsList);
+
+            MapItems(s => s.Numbers)
+                .To(t => t.NumbersCollection);
+
+            MapItems(s => s.Numbers)
+                .To(t => t.NumbersList);
+
+            Map(s => s.Nested)
+                .To(t => t.NestedToo);
         }
 
         public TestMapper(
@@ -54,8 +66,6 @@ namespace OffSync.Mapping.Mappert.Tests.Common
             base(withRules)
         {
         }
-
-        public IEnumerable<MappingRule> CheckedMappingRules => GetCheckedMappingRules();
 
         private (string, string) ValueSplitter(
             string values)

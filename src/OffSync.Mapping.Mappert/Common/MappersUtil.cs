@@ -7,6 +7,32 @@ namespace OffSync.Mapping.Mappert.Common
 {
     public static class MappersUtil
     {
+        public static bool TryCreateAutoMapper(
+            Type sourceType,
+            Type targetType,
+            out object mapper,
+            out Exception exception)
+        {
+            try
+            {
+                mapper = CreateAutoMapper(
+                    sourceType,
+                    targetType);
+
+                exception = null;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                mapper = null;
+
+                exception = ex;
+
+                return false;
+            }
+        }
+
         public static object CreateAutoMapper(
             Type sourceType,
             Type targetType)

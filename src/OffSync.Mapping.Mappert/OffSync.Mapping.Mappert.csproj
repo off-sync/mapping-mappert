@@ -15,6 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj" />
+    <ProjectReference Include="..\OffSync.Mapping.Mappert.Practises\OffSync.Mapping.Mappert.Practises.csproj" />
+    <ProjectReference Include="..\OffSync.Mapping.Mappert.Reflection\OffSync.Mapping.Mappert.Reflection.csproj" />
   </ItemGroup>
 
   <ItemGroup>

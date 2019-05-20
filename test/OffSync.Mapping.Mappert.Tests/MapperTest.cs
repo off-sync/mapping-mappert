@@ -1,25 +1,32 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using NUnit.Framework;
 
+using OffSync.Mapping.Mappert.DynamicMethods;
+using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Mappert.Reflection;
 using OffSync.Mapping.Mappert.Tests.Common;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests
 {
     [TestFixture]
     public class MapperTest
     {
-        private TestMapper _sut;
-
-        [SetUp]
-        public void SetUp()
+        static IMappingDelegateBuilder[] MappingDelegateBuilders = new IMappingDelegateBuilder[]
         {
-            _sut = new TestMapper();
-        }
+            new ReflectionMappingDelegateBuilder(),
+            new DynamicMethodMappingDelegateBuilder(),
+        };
 
         [Test]
-        public void Maps()
+        [TestCaseSource(nameof(MappingDelegateBuilders))]
+        public void Maps(
+            IMappingDelegateBuilder mappingDelegateBuilder)
         {
+            var sut = new TestMapper(mappingDelegateBuilder);
+
             var source = new SourceModel()
             {
                 Id = 1,
@@ -58,9 +65,24 @@ namespace OffSync.Mapping.Mappert.Tests
                     },
                 },
                 Numbers = new List<int>() { 16, 17 }.AsReadOnly(),
+                Ignored = true,
+                Shared = new SharedSub()
+                {
+                    Id = 16,
+                    Label = "17",
+                },
+                MoreItems = Enumerable
+                    .Range(18, 2)
+                    .Select(i =>
+                        new SourceNested()
+                        {
+                            Key = i,
+                            Value = i.ToString(),
+                        })
+                    .OrderByDescending(sn => sn.Key),
             };
 
-            var target = _sut.Map(source);
+            var target = sut.Map(source);
 
             Assert.That(
                 target.Id,
@@ -69,6 +91,10 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.Description,
                 Is.EqualTo("2"));
+
+            Assert.That(
+                target.Nested,
+                Is.Not.Null);
 
             Assert.That(
                 target.Nested.Key,
@@ -153,12 +179,68 @@ namespace OffSync.Mapping.Mappert.Tests
             CollectionAssert.AreEqual(
                 source.Numbers,
                 target.Numbers);
+
+            CollectionAssert.AreEqual(
+                source.Numbers,
+                target.NumbersCollection);
+
+            CollectionAssert.AreEqual(
+                source.Numbers,
+                target.NumbersList);
+
+            Assert.That(
+                target.Excluded,
+                Is.False);
+
+            Assert.That(
+                target.Shared,
+                Is.Not.Null);
+
+            Assert.That(
+                target.Shared.Id,
+                Is.EqualTo(16));
+
+            Assert.That(
+                target.MoreItems,
+                Has.Exactly(2).Items);
+
+            Assert.That(
+                target.MoreItems.First().Key,
+                Is.EqualTo(19));
+
+            Assert.That(
+                target.MoreItems.First().Value,
+                Is.EqualTo("19"));
+
+            Assert.That(
+                target.MoreItems.Skip(1).First().Key,
+                Is.EqualTo(18));
+
+            Assert.That(
+                target.MoreItems.Skip(1).First().Value,
+                Is.EqualTo("18"));
+
+            Assert.That(
+                target.NestedToo,
+                Is.Not.Null);
+
+            Assert.That(
+                target.NestedToo.Key,
+                Is.EqualTo(3));
+
+            Assert.That(
+                target.NestedToo.Value,
+                Is.EqualTo("4"));
         }
 
         [Test]
-        public void MapShouldReturnNullOnNullSource()
+        [TestCaseSource(nameof(MappingDelegateBuilders))]
+        public void MapShouldReturnNullOnNullSource(
+            IMappingDelegateBuilder mappingDelegateBuilder)
         {
-            var target = _sut.Map(null);
+            var sut = new TestMapper(mappingDelegateBuilder);
+
+            var target = sut.Map(null);
 
             Assert.That(
                 target,

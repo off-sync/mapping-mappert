@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OffSync.Mapping.Mappert.Tests.Common
+namespace OffSync.Mapping.Mappert.Tests.Models
 {
     public class TargetModel
     {
@@ -25,6 +25,16 @@ namespace OffSync.Mapping.Mappert.Tests.Common
         public List<TargetNested> ItemsList { get; set; }
 
         public int[] Numbers { get; set; }
+
+        public ICollection<int> NumbersCollection { get; set; }
+
+        public List<int> NumbersList { get; set; }
+
+        public Shared Shared { get; set; }
+
+        public IEnumerable<TargetNested> MoreItems { get; set; }
+
+        public TargetNested NestedToo { get; set; }
     }
 
     public class TargetNested

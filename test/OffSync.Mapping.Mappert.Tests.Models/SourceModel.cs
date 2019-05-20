@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
-namespace OffSync.Mapping.Mappert.Tests.Common
+namespace OffSync.Mapping.Mappert.Tests.Models
 {
     public class SourceModel
     {
@@ -21,6 +22,10 @@ namespace OffSync.Mapping.Mappert.Tests.Common
         public SourceNested[] ItemsArray { get; set; }
 
         public IReadOnlyList<int> Numbers { get; set; }
+
+        public SharedSub Shared { get; set; }
+
+        public IOrderedEnumerable<SourceNested> MoreItems { get; set; }
     }
 
     public class SourceNested

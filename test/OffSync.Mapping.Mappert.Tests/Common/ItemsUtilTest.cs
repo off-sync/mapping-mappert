@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 
@@ -11,59 +12,45 @@ namespace OffSync.Mapping.Mappert.Tests.Common
     public class ItemsUtilTest
     {
         [Test]
-        public void TryGetTargetItemsType()
+        [TestCase(typeof(string[]))]
+        [TestCase(typeof(IEnumerable<string>))]
+        [TestCase(typeof(ICollection<string>))]
+        [TestCase(typeof(IReadOnlyCollection<string>))]
+        [TestCase(typeof(IList<string>))]
+        [TestCase(typeof(IReadOnlyList<string>))]
+        [TestCase(typeof(List<string>))]
+        public void TryGetTargetItemsTypeReturnsSupportedItemsType(
+            Type targetPropertyType)
         {
             Assert.That(
                 ItemsUtil.TryGetTargetItemsType(
-                    typeof(ICollection<string>),
+                    targetPropertyType,
                     out var itemsType),
                Is.True);
 
             Assert.That(
                 itemsType,
                 Is.EqualTo(typeof(string)));
+        }
 
+        [Test]
+        public void TryGetTargetItemsTypeReturnsFalseIfItemsTypeNotSupported()
+        {
             Assert.That(
                 ItemsUtil.TryGetTargetItemsType(
                     typeof(string),
-                    out itemsType),
+                    out var itemsType),
                Is.False);
 
             Assert.That(
                 itemsType,
                 Is.Null);
-        }
 
-        [Test]
-        public void ItemsCountSupportsArrays()
-        {
             Assert.That(
-                ItemsUtil.GetItemsCount(new int[] { 1, 2, 3 }),
-                Is.EqualTo(3));
-        }
-
-        [Test]
-        public void ItemsCountSupportsCollections()
-        {
-            Assert.That(
-                ItemsUtil.GetItemsCount(new List<int> { 1, 2, 3 }.AsReadOnly()),
-                Is.EqualTo(3));
-        }
-
-        [Test]
-        public void ItemsCountSupportsEnumerables()
-        {
-            Assert.That(
-                ItemsUtil.GetItemsCount(Enumerable.Range(1, 3)),
-                Is.EqualTo(3));
-        }
-
-        [Test]
-        public void ItemsCountThrowsExceptionOnUnsupportedType()
-        {
-            Assert.That(
-                () => ItemsUtil.GetItemsCount(123),
-                Throws.ArgumentException);
+                ItemsUtil.TryGetTargetItemsType(
+                    typeof(IList),
+                    out itemsType),
+               Is.False);
         }
     }
 }

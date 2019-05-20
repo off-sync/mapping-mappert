@@ -1,7 +1,6 @@
 ﻿using System;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
-using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Practises;
 
 namespace OffSync.Mapping.Mappert
@@ -25,34 +24,20 @@ namespace OffSync.Mapping.Mappert
         public TTarget Map(
             TSource source)
         {
+            var mappingDelegate = GetCheckedMappingDelegate();
+
             if (source == null)
             {
                 return default;
             }
 
-            var mappingRules = GetCheckedMappingRules();
-
             var target = CreateTarget();
 
-            ApplyMappingRules(
+            mappingDelegate(
                 source,
-                target,
-                mappingRules);
+                target);
 
             return target;
-        }
-
-        protected virtual void ApplyMappingRules(
-            TSource source,
-            TTarget target,
-            MappingRule[] mappingRules)
-        {
-            for (int i = 0; i < mappingRules.Length; i++)
-            {
-                mappingRules[i].Apply(
-                    source,
-                    target);
-            }
         }
     }
 }

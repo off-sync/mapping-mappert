@@ -1,36 +1,19 @@
+﻿using NUnit.Framework;
 
-using NUnit.Framework;
-
-using OffSync.Mapping.Mappert.Tests.Common;
+using OffSync.Mapping.Mappert.MapperBuilders;
+using OffSync.Mapping.Mappert.Tests.Models;
 
 namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
 {
+    [TestFixture]
     public class MapperBuilderTest
     {
-        private TestMapper _sut;
-
-        [SetUp]
-        public void Setup()
-        {
-            _sut = new TestMapper();
-        }
-
         [Test]
-        public void ChecksMappingRules()
+        public void ConstructorShouldCheckPreConditions()
         {
-            int expectedRuleCount = 9;
-
-            var mappingRules = _sut.CheckedMappingRules;
-
             Assert.That(
-                mappingRules,
-                Has.Exactly(expectedRuleCount).Items);
-
-            mappingRules = _sut.CheckedMappingRules;
-
-            Assert.That(
-                mappingRules,
-                Has.Exactly(expectedRuleCount).Items);
+                () => new MapperBuilder<SourceModel, TargetModel>(null),
+                Throws.ArgumentNullException);
         }
     }
 }

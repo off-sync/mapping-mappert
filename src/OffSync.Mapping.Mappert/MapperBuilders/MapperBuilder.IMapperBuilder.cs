@@ -3,17 +3,32 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
     public partial class MapperBuilder<TSource, TTarget> :
         IMapperBuilder<TSource, TTarget>
     {
+        private IMappingDelegateBuilder _mappingDelegateBuilder;
+
+        IMapperBuilder<TSource, TTarget> IMapperBuilder<TSource, TTarget>.WithMappingDelegateBuilder(
+            IMappingDelegateBuilder mappingDelegateBuilder)
+        {
+            _mappingDelegateBuilder = mappingDelegateBuilder;
+
+            return this;
+        }
+
+        protected IMapperBuilder<TSource, TTarget> WithMappingDelegateBuilder(
+            IMappingDelegateBuilder mappingDelegateBuilder)
+            => ((IMapperBuilder<TSource, TTarget>)this).WithMappingDelegateBuilder(mappingDelegateBuilder);
+
         MappingItemsRuleBuilder<TFrom, TTarget> IMapperBuilder<TSource, TTarget>.MapItems<TFrom>(
             Expression<Func<TSource, IEnumerable<TFrom>>> from)
         {
             var mappingRule = AddMappingRule()
-                .WithSource(from, typeof(TFrom));
+                .WithSourceItems(from, typeof(TFrom));
 
             return new MappingItemsRuleBuilder<TFrom, TTarget>(mappingRule);
         }

@@ -2,35 +2,37 @@
 using System.Collections;
 using System.Linq;
 
-using OffSync.Mapping.Mappert.Common;
+using OffSync.Mapping.Mappert.Practises.Builders;
+using OffSync.Mapping.Mappert.Practises.MappingRules;
+using OffSync.Mapping.Mappert.Reflection.Common;
 
-namespace OffSync.Mapping.Mappert.MappingRules
+namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
 {
-    public static partial class MappingRulesExtensions
+    public static partial class MappingStepsExtensions
     {
         public static void Apply<TSource, TTarget>(
-            this MappingRule mappingRule,
+            this MappingStep mappingStep,
             TSource source,
             TTarget target)
         {
-            switch (mappingRule.MappingStrategy)
+            switch (mappingStep.MappingRuleType)
             {
-                case MappingStrategies.MapToValue:
-                    mappingRule.ApplyToValue(
+                case MappingRuleTypes.MapToValue:
+                    mappingStep.ApplyToValue(
                         source,
                         target);
 
                     return;
 
-                case MappingStrategies.MapToArray:
-                    mappingRule.ApplyToArray(
+                case MappingRuleTypes.MapToArray:
+                    mappingStep.ApplyToArray(
                         source,
                         target);
 
                     return;
 
-                case MappingStrategies.MapToCollection:
-                    mappingRule.ApplyToCollection(
+                case MappingRuleTypes.MapToCollection:
+                    mappingStep.ApplyToCollection(
                         source,
                         target);
 
@@ -39,76 +41,71 @@ namespace OffSync.Mapping.Mappert.MappingRules
         }
 
         private static void ApplyToValue<TSource, TTarget>(
-            this MappingRule mappingRule,
+            this MappingStep mappingStep,
             TSource source,
             TTarget target)
         {
             object value;
 
-            if (mappingRule.Builder == null)
+            if (mappingStep.Builder == null)
             {
                 // get value from single source property
-                value = mappingRule
+                value = mappingStep
                     .SourceProperties[0]
                     .GetValue(source);
             }
             else
             {
                 // use builder to get value from source properties
-                var froms = mappingRule
+                var froms = mappingStep
                     .SourceProperties
                     .Select(pi => pi.GetValue(source))
                     .ToArray();
 
-                value = mappingRule
-                    .Builder
-                    .DynamicInvoke(froms);
+                value = mappingStep
+                    .BuilderInvoke
+                    .Invoke(
+                        mappingStep.Builder,
+                        froms);
             }
 
-            var targetPropertyCount = mappingRule.TargetProperties.Count;
-
-            if (targetPropertyCount == 1)
+            switch (mappingStep.BuilderType)
             {
-                // set value of single target property
-                mappingRule
-                    .TargetProperties[0]
-                    .SetValue(target, value);
+                case BuilderTypes.ValueTuple:
+                    // multi-valued assignment using ValueTuple
+                    mappingStep.ApplyFromValueTuple(
+                        target,
+                        value);
 
-                return;
+                    return;
+
+                case BuilderTypes.ObjectArray:
+                    // multi-valued assignment using object array
+                    mappingStep.ApplyFromArray(
+                        target,
+                        (object[])value);
+
+                    return;
+
+                // BuilderTypes.NoBuilder:
+                // BuilderTypes.SingleValue:
+                default:
+                    // set value of single target property
+                    mappingStep
+                        .TargetProperties[0]
+                        .SetValue(target, value);
+
+                    return;
             }
-
-            // multi-valued assignment using ValueTuple
-            if (mappingRule.BuilderValueTupleFields != null)
-            {
-                mappingRule.ApplyFromValueTuple(
-                    target,
-                    value);
-
-                return;
-            }
-
-            // multi-valued assignment using object array
-            if (value.GetType().IsArray &&
-                ((object[])value).Length == targetPropertyCount)
-            {
-                mappingRule.ApplyFromArray(
-                    target,
-                    (object[])value);
-
-                return;
-            }
-
-            throw new InvalidOperationException(
-                $"invalid builder result: {value.GetType().FullName}");
         }
 
         private static void ApplyToArray<TSource, TTarget>(
-            this MappingRule mappingRule,
+            this MappingStep mappingStep,
             TSource source,
             TTarget target)
         {
             // get source value
-            var value = mappingRule
+            var value = mappingStep
                 .SourceProperties[0]
                 .GetValue(source);
 
@@ -117,7 +114,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
             // create new array
             var array = ItemsUtil.CreateArray(
-                mappingRule.TargetTypes[0],
+                mappingStep.TargetItemType,
                 length);
 
             // loop source values and set to array
@@ -125,7 +122,7 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
             foreach (var item in (IEnumerable)value)
             {
-                var targetItem = mappingRule.GetTargetItemValue(item);
+                var targetItem = mappingStep.GetTargetItemValue(item);
 
                 array.SetValue(
                     targetItem,
@@ -133,36 +130,36 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
 
             // set target value
-            mappingRule
+            mappingStep
                 .TargetProperties[0]
                 .SetValue(target, array);
         }
 
         private static void ApplyToCollection<TSource, TTarget>(
-            this MappingRule mappingRule,
+            this MappingStep mappingStep,
             TSource source,
             TTarget target)
         {
             // get source value
-            var value = mappingRule
+            var value = mappingStep
                 .SourceProperties[0]
                 .GetValue(source);
 
             // create new collection
             var collection = ItemsUtil.CreateCollection(
-                mappingRule.TargetProperties[0].PropertyType,
-                mappingRule.TargetTypes[0]);
+                mappingStep.TargetProperties[0].PropertyType,
+                mappingStep.TargetItemType);
 
             var addMethod = collection
                 .GetType()
                 .GetMethod(
                     "Add",
-                    new Type[] { mappingRule.TargetTypes[0] });
+                    new Type[] { mappingStep.TargetItemType });
 
             // loop source values and add to collection
             foreach (var item in (IEnumerable)value)
             {
-                var targetItem = mappingRule.GetTargetItemValue(item);
+                var targetItem = mappingStep.GetTargetItemValue(item);
 
                 addMethod.Invoke(
                     collection,
@@ -170,16 +167,16 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
 
             // set target value
-            mappingRule
+            mappingStep
                 .TargetProperties[0]
                 .SetValue(target, collection);
         }
 
         private static object GetTargetItemValue(
-            this MappingRule mappingRule,
+            this MappingStep mappingStep,
             object sourceItem)
         {
-            if (mappingRule.Builder == null)
+            if (mappingStep.Builder == null)
             {
                 // return source value
                 return sourceItem;
@@ -188,23 +185,25 @@ namespace OffSync.Mapping.Mappert.MappingRules
             // use builder to get value from source value
             var froms = new object[] { sourceItem };
 
-            return mappingRule
-                .Builder
-                .DynamicInvoke(froms);
+            return mappingStep
+                .BuilderInvoke
+                .Invoke(
+                    mappingStep.Builder,
+                    froms);
         }
 
-        public static void ApplyFromValueTuple<TTarget>(
-            this MappingRule mappingRule,
+        private static void ApplyFromValueTuple<TTarget>(
+            this MappingStep mappingStep,
             TTarget target,
             object value)
         {
-            for (int i = 0; i < mappingRule.TargetProperties.Count; i++)
+            for (int i = 0; i < mappingStep.TargetProperties.Length; i++)
             {
-                var field = mappingRule.BuilderValueTupleFields[i];
+                var item = mappingStep
+                    .ValueTupleFields[i]
+                    .GetValue(value);
 
-                var item = field.GetValue(value);
-
-                mappingRule
+                mappingStep
                     .TargetProperties[i]
                     .SetValue(
                         target,
@@ -212,14 +211,20 @@ namespace OffSync.Mapping.Mappert.MappingRules
             }
         }
 
-        public static void ApplyFromArray<TTarget>(
-            this MappingRule mappingRule,
+        private static void ApplyFromArray<TTarget>(
+            this MappingStep mappingStep,
             TTarget target,
             object[] value)
         {
-            for (int i = 0; i < mappingRule.TargetProperties.Count; i++)
+            if (mappingStep.TargetProperties.Length != value.Length)
             {
-                mappingRule
+                throw new InvalidOperationException(
+                    $"invalid number of objects in value '{value.Length}', expected '{mappingStep.TargetProperties.Length}'");
+            }
+
+            for (int i = 0; i < mappingStep.TargetProperties.Length; i++)
+            {
+                mappingStep
                     .TargetProperties[i]
                     .SetValue(
                         target,

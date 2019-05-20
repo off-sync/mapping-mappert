@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,116 +10,119 @@ namespace OffSync.Mapping.Mappert.Common
             this Type type,
             out Type itemsType)
         {
-            if (type.IsArray)
-            {
-                itemsType = type.GetElementType();
+            itemsType = GetSourceItemsTypeOrDefault(type);
 
-                return true;
-            }
-
-            if (IsGenericEnumerable(type) ||
-                type.GetInterfaces().Any(IsGenericEnumerable))
-            {
-                itemsType = type.GetGenericArguments()[0];
-
-                return true;
-            }
-
-            itemsType = null;
-
-            return false;
+            return itemsType != null;
         }
 
-        private static bool IsGenericEnumerable(
-            Type type)
+        public static Type GetSourceItemsTypeOrDefault(
+            this Type type)
         {
-            return type.IsGenericType &&
-                type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+            if (type.IsArray) // T[] is supported
+            {
+                return type.GetElementType();
+            }
+
+            if (type.IsInterface &&
+                IsGenericEnumerable(type)) // IEnumerable<T> is supported
+            {
+                return type.GetGenericArguments()[0];
+            }
+
+            if (type.IsInterface ||
+                (type.IsClass &&
+                !type.IsAbstract))
+            {
+                var iface = type
+                    .GetInterfaces()
+                    .FirstOrDefault(IsGenericEnumerable);
+
+                if (iface != null) // IEnumerable<T> is supported
+                {
+                    return iface.GetGenericArguments()[0];
+                }
+            }
+
+            return null;
         }
 
         public static bool TryGetTargetItemsType(
             this Type type,
             out Type itemsType)
         {
-            if (type.IsArray)
-            {
-                itemsType = type.GetElementType();
+            itemsType = GetTargetItemsTypeOrDefault(type);
 
-                return true;
+            return itemsType != null;
+        }
+
+        public static Type GetTargetItemsTypeOrDefault(
+            this Type type)
+        {
+            if (type.IsArray) // T[] is supported
+            {
+                return type.GetElementType();
             }
 
-            if (IsGenericCollection(type) ||
-                type.GetInterfaces().Any(IsGenericCollection))
+            if (type.IsInterface &&
+                (IsGenericEnumerable(type) || // IEnumerable<T> is supported
+                    IsGenericCollection(type) || // I{ReadOnly}Collection<T> is supported
+                    IsGenericList(type))) // I{ReadOnly}List<T> is supported
             {
-                itemsType = type.GetGenericArguments()[0];
-
-                return true;
+                return type.GetGenericArguments()[0];
             }
 
-            itemsType = null;
+            if (type.IsClass &&
+                !type.IsAbstract)
+            {
+                var iface = type
+                    .GetInterfaces()
+                    .FirstOrDefault(IsGenericCollection);
 
-            return false;
+                if (iface != null)
+                {
+                    // concrete classes must implement ICollection<T>
+                    return iface.GetGenericArguments()[0];
+                }
+            }
+
+            return null;
+        }
+
+        #region Helpers
+        private static bool IsGenericEnumerable(
+            Type type)
+        {
+            if (!type.IsGenericType)
+            {
+                return false;
+            }
+
+            return type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
         }
 
         private static bool IsGenericCollection(
             Type type)
         {
-            return type.IsGenericType &&
-                type.GetGenericTypeDefinition() == typeof(ICollection<>);
+            if (!type.IsGenericType)
+            {
+                return false;
+            }
+
+            return type.GetGenericTypeDefinition() == typeof(ICollection<>) ||
+                type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>);
         }
 
-        public static int GetItemsCount(
-            object value)
+        private static bool IsGenericList(
+            Type type)
         {
-            var type = value.GetType();
-
-            if (type.IsArray)
+            if (!type.IsGenericType)
             {
-                return ((Array)value).Length;
+                return false;
             }
 
-            if (typeof(ICollection).IsAssignableFrom(type))
-            {
-                return ((ICollection)value).Count;
-            }
-
-            if (typeof(IEnumerable).IsAssignableFrom(type))
-            {
-                var count = 0;
-
-                foreach (var item in (IEnumerable)value)
-                {
-                    count++;
-                }
-
-                return count;
-            }
-
-            throw new ArgumentException(
-                $"value has unsupported items type: '{type.FullName}'",
-                nameof(value));
+            return type.GetGenericTypeDefinition() == typeof(IList<>) ||
+                type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>);
         }
-
-        public static Array CreateArray(
-            Type type,
-            int length)
-        {
-            return (Array)Activator.CreateInstance(
-                type.MakeArrayType(),
-                new object[] { length });
-        }
-
-        public static object CreateCollection(
-            Type type,
-            Type itemsType)
-        {
-            if (type.IsClass)
-            {
-                return Activator.CreateInstance(type);
-            }
-
-            return Activator.CreateInstance(
-                typeof(List<>).MakeGenericType(itemsType));
-        }
+        #endregion
     }
 }
