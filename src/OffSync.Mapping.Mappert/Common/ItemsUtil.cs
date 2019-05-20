@@ -92,24 +92,36 @@ namespace OffSync.Mapping.Mappert.Common
         private static bool IsGenericEnumerable(
             Type type)
         {
-            return type.IsGenericType &&
-                type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+            if (!type.IsGenericType)
+            {
+                return false;
+            }
+
+            return type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
         }
 
         private static bool IsGenericCollection(
             Type type)
         {
-            return type.IsGenericType &&
-                (type.GetGenericTypeDefinition() == typeof(ICollection<>) ||
-                type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>));
+            if (!type.IsGenericType)
+            {
+                return false;
+            }
+
+            return type.GetGenericTypeDefinition() == typeof(ICollection<>) ||
+                type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>);
         }
 
         private static bool IsGenericList(
             Type type)
         {
-            return type.IsGenericType &&
-                (type.GetGenericTypeDefinition() == typeof(IList<>) ||
-                type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
+            if (!type.IsGenericType)
+            {
+                return false;
+            }
+
+            return type.GetGenericTypeDefinition() == typeof(IList<>) ||
+                type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>);
         }
         #endregion
     }

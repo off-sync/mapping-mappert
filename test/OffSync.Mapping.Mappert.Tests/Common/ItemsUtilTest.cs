@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 
@@ -10,27 +12,45 @@ namespace OffSync.Mapping.Mappert.Tests.Common
     public class ItemsUtilTest
     {
         [Test]
-        public void TryGetTargetItemsType()
+        [TestCase(typeof(string[]))]
+        [TestCase(typeof(IEnumerable<string>))]
+        [TestCase(typeof(ICollection<string>))]
+        [TestCase(typeof(IReadOnlyCollection<string>))]
+        [TestCase(typeof(IList<string>))]
+        [TestCase(typeof(IReadOnlyList<string>))]
+        [TestCase(typeof(List<string>))]
+        public void TryGetTargetItemsTypeReturnsSupportedItemsType(
+            Type targetPropertyType)
         {
             Assert.That(
                 ItemsUtil.TryGetTargetItemsType(
-                    typeof(ICollection<string>),
+                    targetPropertyType,
                     out var itemsType),
                Is.True);
 
             Assert.That(
                 itemsType,
                 Is.EqualTo(typeof(string)));
+        }
 
+        [Test]
+        public void TryGetTargetItemsTypeReturnsFalseIfItemsTypeNotSupported()
+        {
             Assert.That(
                 ItemsUtil.TryGetTargetItemsType(
                     typeof(string),
-                    out itemsType),
+                    out var itemsType),
                Is.False);
 
             Assert.That(
                 itemsType,
                 Is.Null);
+
+            Assert.That(
+                ItemsUtil.TryGetTargetItemsType(
+                    typeof(IList),
+                    out itemsType),
+               Is.False);
         }
     }
 }
