@@ -43,6 +43,12 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                         .To(t => t.ItemsList);
 
                     b.IgnoreTarget(t => t.NumbersCollection);
+
+                    b.MapItems(s => s.Numbers)
+                        .To(t => t.NumbersList);
+
+                    b.Map(s => s.Nested)
+                        .To(t => t.NestedToo);
                 });
 
             Assert.That(
@@ -82,6 +88,12 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                         .To(t => t.ItemsList);
 
                     b.IgnoreTarget(t => t.NumbersCollection);
+
+                    b.MapItems(s => s.Numbers)
+                        .To(t => t.NumbersList);
+
+                    b.Map(s => s.Nested)
+                        .To(t => t.NestedToo);
                 });
 
             Assert.That(
@@ -123,6 +135,12 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                         .To(t => t.ItemsList);
 
                     b.IgnoreTarget(t => t.NumbersCollection);
+
+                    b.MapItems(s => s.Numbers)
+                        .To(t => t.NumbersList);
+
+                    b.Map(s => s.Nested)
+                        .To(t => t.NestedToo);
                 });
 
             Assert.That(

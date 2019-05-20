@@ -93,6 +93,10 @@ namespace OffSync.Mapping.Mappert.Tests
                 Is.EqualTo("2"));
 
             Assert.That(
+                target.Nested,
+                Is.Not.Null);
+
+            Assert.That(
                 target.Nested.Key,
                 Is.EqualTo(3));
 
@@ -176,6 +180,14 @@ namespace OffSync.Mapping.Mappert.Tests
                 source.Numbers,
                 target.Numbers);
 
+            CollectionAssert.AreEqual(
+                source.Numbers,
+                target.NumbersCollection);
+
+            CollectionAssert.AreEqual(
+                source.Numbers,
+                target.NumbersList);
+
             Assert.That(
                 target.Excluded,
                 Is.False);
@@ -207,6 +219,18 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.MoreItems.Skip(1).First().Value,
                 Is.EqualTo("18"));
+
+            Assert.That(
+                target.NestedToo,
+                Is.Not.Null);
+
+            Assert.That(
+                target.NestedToo.Key,
+                Is.EqualTo(3));
+
+            Assert.That(
+                target.NestedToo.Value,
+                Is.EqualTo("4"));
         }
 
         [Test]

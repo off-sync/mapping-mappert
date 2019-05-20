@@ -53,6 +53,12 @@ namespace OffSync.Mapping.Mappert.Tests.Common
 
             MapItems(s => s.Numbers)
                 .To(t => t.NumbersCollection);
+
+            MapItems(s => s.Numbers)
+                .To(t => t.NumbersList);
+
+            Map(s => s.Nested)
+                .To(t => t.NestedToo);
         }
 
         public TestMapper(
