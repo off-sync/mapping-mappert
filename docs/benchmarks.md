@@ -10,9 +10,14 @@ Intel Core i7-4700HQ CPU 2.40GHz (Haswell), 1 CPU, 8 logical and 4 physical core
 Job=Core  Runtime=Core  
 ```
 
-|           Method |       Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
-|----------------- |-----------:|----------:|----------:|------:|--------:|-----:|
-|         MapEmpty |   130.9 ns | 0.1667 ns | 0.1477 ns |  1.00 |    0.00 |    1 |
-|        MapSimple |   836.9 ns | 1.8635 ns | 1.7431 ns |  6.39 |    0.02 |    2 |
-| MapArraySplitter | 2,010.6 ns | 3.8129 ns | 3.1840 ns | 15.36 |    0.03 |    3 |
-| MapTupleSplitter | 2,431.0 ns | 6.6690 ns | 6.2382 ns | 18.57 |    0.05 |    4 |
+|           Method | MappingDelegateBuilder |       Mean |      Error |     StdDev | Ratio | RatioSD | Rank |
+|----------------- |----------------------- |-----------:|-----------:|-----------:|------:|--------:|-----:|
+|         **MapEmpty** |             **Reflection** |   **136.2 ns** |   **2.761 ns** |   **2.448 ns** |  **1.00** |    **0.00** |    **1** |
+|        MapSimple |             Reflection |   814.9 ns |   6.944 ns |   6.155 ns |  5.99 |    0.11 |    2 |
+| MapArraySplitter |             Reflection | 1,934.0 ns |  11.061 ns |  10.347 ns | 14.21 |    0.27 |    3 |
+| MapTupleSplitter |             Reflection | 2,388.4 ns |  41.148 ns |  36.476 ns | 17.55 |    0.42 |    4 |
+|                  |                        |            |            |            |       |         |      |
+|         **MapEmpty** |          **DynamicMethod** |   **133.8 ns** |   **2.688 ns** |   **2.383 ns** |  **1.00** |    **0.00** |    **1** |
+|        MapSimple |          DynamicMethod |   137.1 ns |   2.569 ns |   2.403 ns |  1.02 |    0.02 |    1 |
+| MapArraySplitter |          DynamicMethod | 1,040.9 ns |  17.747 ns |  15.733 ns |  7.78 |    0.24 |    2 |
+| MapTupleSplitter |          DynamicMethod | 1,515.0 ns | 144.411 ns | 425.800 ns | 11.87 |    1.86 |    3 |
