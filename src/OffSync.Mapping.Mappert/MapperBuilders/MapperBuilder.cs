@@ -15,16 +15,16 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         }
 
         public MapperBuilder(
-            Action<IMapperBuilder<TSource, TTarget>> withMappingRules)
+            Action<IMapperBuilder<TSource, TTarget>> configure)
         {
             #region Pre-conditions
-            if (withMappingRules == null)
+            if (configure == null)
             {
-                throw new ArgumentNullException(nameof(withMappingRules));
+                throw new ArgumentNullException(nameof(configure));
             }
             #endregion
 
-            withMappingRules(this);
+            configure(this);
         }
 
         /// <summary>

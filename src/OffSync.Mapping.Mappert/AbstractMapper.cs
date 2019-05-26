@@ -14,8 +14,8 @@ namespace OffSync.Mapping.Mappert
         }
 
         protected AbstractMapper(
-            Action<IMapperBuilder<TSource, TTarget>> withMappingRules) :
-            base(withMappingRules)
+            Action<IMapperBuilder<TSource, TTarget>> configure) :
+            base(configure)
         {
         }
 
