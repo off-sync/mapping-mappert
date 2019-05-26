@@ -1,6 +1,5 @@
 jobs:
 - job: Test
-  dependsOn: Build
   pool:
     vmImage: 'windows-latest'
   strategy:
@@ -29,6 +28,7 @@ jobs:
     inputs:
       testRunner: VSTest
       testResultsFiles: '**/*.trx'
+      mergeTestResults: true
 
 - job: Quality
   dependsOn: Test
