@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Mappert.Practises.Validation;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
@@ -23,6 +24,18 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         protected IMapperBuilder<TSource, TTarget> WithMappingDelegateBuilder(
             IMappingDelegateBuilder mappingDelegateBuilder)
             => ((IMapperBuilder<TSource, TTarget>)this).WithMappingDelegateBuilder(mappingDelegateBuilder);
+
+        IMapperBuilder<TSource, TTarget> IMapperBuilder<TSource, TTarget>.WithValidator(
+            IMappingValidator validator)
+        {
+            _validators.Add(validator);
+
+            return this;
+        }
+
+        protected IMapperBuilder<TSource, TTarget> WithValidator(
+            IMappingValidator validator)
+            => ((IMapperBuilder<TSource, TTarget>)this).WithValidator(validator);
 
         MappingItemsRuleBuilder<TFrom, TTarget> IMapperBuilder<TSource, TTarget>.MapItems<TFrom>(
             Expression<Func<TSource, IEnumerable<TFrom>>> from)

@@ -7,6 +7,29 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
 {
     public static class BuildersUtil
     {
+        public static bool TryGetBuilderType(
+            IMappingRule mappingRule,
+            out BuilderTypes builderType,
+            out Exception exception)
+        {
+            try
+            {
+                builderType = GetBuilderType(mappingRule);
+
+                exception = null;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                builderType = BuilderTypes.NoBuilder;
+
+                exception = ex;
+
+                return false;
+            }
+        }
+
         public static BuilderTypes GetBuilderType(
             IMappingRule mappingRule)
         {

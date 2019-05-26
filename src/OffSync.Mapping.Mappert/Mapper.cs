@@ -13,8 +13,8 @@ namespace OffSync.Mapping.Mappert
         }
 
         public Mapper(
-            Action<IMapperBuilder<TSource, TTarget>> withMappingRules) :
-            base(withMappingRules)
+            Action<IMapperBuilder<TSource, TTarget>> configure) :
+            base(configure)
         {
         }
 

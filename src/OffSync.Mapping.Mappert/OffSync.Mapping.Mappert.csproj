@@ -6,7 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj" />
+    <PackageReference Include="OffSync.Mapping.Practises" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OffSync.Mapping.Mappert.Practises\OffSync.Mapping.Mappert.Practises.csproj" />
     <ProjectReference Include="..\OffSync.Mapping.Mappert.Reflection\OffSync.Mapping.Mappert.Reflection.csproj" />
   </ItemGroup>

@@ -12,6 +12,10 @@ namespace OffSync.Mapping.Mappert.MappingRules
 
         private readonly List<PropertyInfo> _targetProperties = new List<PropertyInfo>();
 
+        public MappingRule()
+        {
+        }
+
         public override string ToString()
         {
             var sourceNames = string.Join(

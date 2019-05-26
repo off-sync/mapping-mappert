@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert", "src\OffSync.Mapping.Mappert\OffSync.Mapping.Mappert.csproj", "{007F4970-6434-48A4-9AE3-444DC8231047}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Practises", "..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj", "{5B804CEC-F8F2-4CB3-80A1-AA57EBB0E447}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Tests", "test\OffSync.Mapping.Mappert.Tests\OffSync.Mapping.Mappert.Tests.csproj", "{DE9B29BB-98DA-472C-BF28-507C7306B1DD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Benchmarks", "test\OffSync.Mapping.Mappert.Benchmarks\OffSync.Mapping.Mappert.Benchmarks.csproj", "{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}"
@@ -32,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Ref
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Practises.Tests", "test\OffSync.Mapping.Mappert.Practises.Tests\OffSync.Mapping.Mappert.Practises.Tests.csproj", "{F35290D2-0126-4C3E-B5BB-E77D96D443FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OffSync.Mapping.Mappert.Tests.Models", "test\OffSync.Mapping.Mappert.Tests.Models\OffSync.Mapping.Mappert.Tests.Models.csproj", "{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Tests.Models", "test\OffSync.Mapping.Mappert.Tests.Models\OffSync.Mapping.Mappert.Tests.Models.csproj", "{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,10 +42,6 @@ Global
 		{007F4970-6434-48A4-9AE3-444DC8231047}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{007F4970-6434-48A4-9AE3-444DC8231047}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{007F4970-6434-48A4-9AE3-444DC8231047}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B804CEC-F8F2-4CB3-80A1-AA57EBB0E447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B804CEC-F8F2-4CB3-80A1-AA57EBB0E447}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B804CEC-F8F2-4CB3-80A1-AA57EBB0E447}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B804CEC-F8F2-4CB3-80A1-AA57EBB0E447}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE9B29BB-98DA-472C-BF28-507C7306B1DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE9B29BB-98DA-472C-BF28-507C7306B1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE9B29BB-98DA-472C-BF28-507C7306B1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU

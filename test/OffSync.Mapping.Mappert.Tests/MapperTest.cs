@@ -14,7 +14,7 @@ namespace OffSync.Mapping.Mappert.Tests
     [TestFixture]
     public class MapperTest
     {
-        static IMappingDelegateBuilder[] MappingDelegateBuilders = new IMappingDelegateBuilder[]
+        static readonly IMappingDelegateBuilder[] MappingDelegateBuilders = new IMappingDelegateBuilder[]
         {
             new ReflectionMappingDelegateBuilder(),
             new DynamicMethodMappingDelegateBuilder(),
@@ -245,6 +245,56 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target,
                 Is.Null);
+        }
+
+        [Test]
+        public void MapperShouldMapCompatibleTypesWithoutConfiguration()
+        {
+            var sut = new Mapper<SourceNested, TargetNested>();
+
+            var source = new SourceNested()
+            {
+                Key = 1,
+                Value = "2",
+            };
+
+            var target = sut.Map(source);
+
+            Assert.That(
+                target.Key,
+                Is.EqualTo(1));
+
+            Assert.That(
+                target.Value,
+                Is.EqualTo("2"));
+        }
+
+        [Test]
+        public void MapperShouldAcceptConfiguration()
+        {
+            var sut = new Mapper<SourceNested, TargetNested>(
+                b =>
+                {
+                    b.Map(s => s.Key)
+                        .To(t => t.Key)
+                        .Using(i => i * 2);
+                });
+
+            var source = new SourceNested()
+            {
+                Key = 1,
+                Value = "2",
+            };
+
+            var target = sut.Map(source);
+
+            Assert.That(
+                target.Key,
+                Is.EqualTo(2));
+
+            Assert.That(
+                target.Value,
+                Is.EqualTo("2"));
         }
     }
 }
