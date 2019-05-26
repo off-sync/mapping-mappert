@@ -1,10 +1,7 @@
-variables:
-  poolVmImage: 'windows-latest'
-
 jobs:
 - job: Build
   pool:
-    vmImage: '$(poolVmImage)'
+    vmImage: 'windows-latest'
   steps:
   - task: UseDotNet@2
     displayName: 'Use .NET Core 2.2 SDK'
@@ -36,7 +33,7 @@ jobs:
 - job: Test
   dependsOn: Build
   pool:
-    vmImage: '$(poolVmImage)'
+    vmImage: 'windows-latest'
   strategy:
     matrix:
       Mappert:
@@ -57,7 +54,7 @@ jobs:
 - job: Quality
   dependsOn: Test
   pool:
-    vmImage: '$(poolVmImage)'
+    vmImage: 'windows-latest'
   steps:
   - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
     displayName: ReportGenerator
@@ -83,7 +80,7 @@ jobs:
 - job: Pack
   dependsOn: Test
   pool:
-    vmImage: '$(poolVmImage)'
+    vmImage: 'windows-latest'
   strategy:
     matrix:
       Mappert:
@@ -105,7 +102,7 @@ jobs:
 - job: Publish
   dependsOn: Pack
   pool:
-    vmImage: '$(poolVmImage)'
+    vmImage: 'windows-latest'
   steps:
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Build Artifacts'
