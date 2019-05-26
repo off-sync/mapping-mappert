@@ -28,7 +28,7 @@ namespace OffSync.Mapping.Mappert
 
             if (source == null)
             {
-                return default;
+                return default(TTarget);
             }
 
             var target = CreateTarget();
