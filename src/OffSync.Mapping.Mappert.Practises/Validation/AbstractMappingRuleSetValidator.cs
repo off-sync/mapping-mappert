@@ -42,7 +42,7 @@ namespace OffSync.Mapping.Mappert.Practises.Validation
             };
         }
 
-        protected MappingRuleSetValidationResult<TMappingRule> AddOrRemoveRules(
+        protected MappingRuleSetValidationResult<TMappingRule> UpdateRules(
             IEnumerable<TMappingRule> rulesToAdd = null,
             IEnumerable<TMappingRule> rulesToRemove = null)
         {

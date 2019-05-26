@@ -1,7 +1,7 @@
 ﻿using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
 
-namespace OffSync.Mapping.Mappert.Tests.Validation
+namespace OffSync.Mapping.Mappert.Tests.Common
 {
     public class TestMappingRuleValidator :
         AbstractMappingRuleValidator

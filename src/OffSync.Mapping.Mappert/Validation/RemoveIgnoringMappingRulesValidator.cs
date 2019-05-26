@@ -18,7 +18,7 @@ namespace OffSync.Mapping.Mappert.Validation
 
             if (rulesToRemove.Any())
             {
-                return AddOrRemoveRules(rulesToRemove: rulesToRemove);
+                return UpdateRules(rulesToRemove: rulesToRemove);
             }
 
             return Valid();

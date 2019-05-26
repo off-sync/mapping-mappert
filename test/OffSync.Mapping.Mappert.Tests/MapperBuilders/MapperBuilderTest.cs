@@ -1,18 +1,30 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+
+using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
-using OffSync.Mapping.Mappert.Tests.Common;
 using OffSync.Mapping.Mappert.Tests.Models;
-using OffSync.Mapping.Mappert.Tests.Validation;
-using OffSync.Mapping.Mappert.Validation.Exceptions;
 
 namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
 {
     [TestFixture]
-    public class MapperBuilderTest
+    public partial class MapperBuilderTest
     {
+        public class TestMapperBuilder :
+            MapperBuilder<SourceModel, TargetModel>
+        {
+            public TestMapperBuilder(
+                IMappingRuleValidator ruleValidator,
+                IMappingRuleSetValidator<MappingRule> ruleSetValidator)
+            {
+                WithValidator(ruleValidator);
+
+                WithValidator(ruleSetValidator);
+            }
+        }
+
         [Test]
         public void ConstructorShouldCheckPreConditions()
         {
@@ -22,57 +34,23 @@ namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
         }
 
         [Test]
-        public void WithValidator()
+        public void ShouldAcceptValidators()
         {
-            var mapper = new TestMapper(b =>
-            {
-                b.WithValidator(
-                    new TestMappingRuleSetValidator(
-                        new MappingRuleSetValidationResult<MappingRule>()
-                        {
-                            Result = MappingRuleSetValidationResults.Valid,
-                        }));
-            });
+            var ruleValidator = new Mock<IMappingRuleValidator>();
 
-            mapper.Map(null);
-        }
+            var ruleSetValidator = new Mock<IMappingRuleSetValidator<MappingRule>>();
 
-        [Test]
-        public void ValidateMappingRulesThrowsExceptions()
-        {
-            var mapper = new TestMapper(b =>
-            {
-                b.WithValidator(
-                    new TestMappingRuleValidator(
-                        new MappingRuleValidationResult()
-                        {
-                            Result = MappingRuleValidationResults.Invalid,
-                            Message = "validation error",
-                        }));
+            new MapperBuilder<SourceModel, TargetModel>(
+                b =>
+                {
+                    b.WithValidator(ruleValidator.Object);
 
-                // add at least one rule to trigger mapping rule validator
-                b.Map(s => s.Id)
-                    .To(t => t.Id);
-            });
+                    b.WithValidator(ruleSetValidator.Object);
+                });
 
-            Assert.That(
-                () => mapper.Map(null),
-                Throws.TypeOf<MappingRuleValidationException>());
-
-            mapper = new TestMapper(b =>
-            {
-                b.WithValidator(
-                    new TestMappingRuleSetValidator(
-                        new MappingRuleSetValidationResult<MappingRule>()
-                        {
-                            Result = MappingRuleSetValidationResults.Invalid,
-                            Message = "validation error",
-                        }));
-            });
-
-            Assert.That(
-                () => mapper.Map(null),
-                Throws.TypeOf<MappingRuleSetValidationException>());
+            new TestMapperBuilder(
+                ruleValidator.Object,
+                ruleSetValidator.Object);
         }
     }
 }

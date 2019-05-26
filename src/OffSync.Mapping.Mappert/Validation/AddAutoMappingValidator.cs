@@ -42,7 +42,12 @@ namespace OffSync.Mapping.Mappert.Validation
                 rulesToAdd.Add(mappingRule);
             }
 
-            return AddOrRemoveRules(rulesToAdd);
+            if (rulesToAdd.Any())
+            {
+                return UpdateRules(rulesToAdd);
+            }
+
+            return Valid();
         }
     }
 }
