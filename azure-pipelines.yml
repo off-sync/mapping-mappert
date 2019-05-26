@@ -34,6 +34,7 @@ jobs:
       arguments: '--configuration Debug'
 
 - job: Test
+  dependsOn: Build
   pool:
     vmImage: '$(poolVmImage)'
   strategy:
@@ -54,6 +55,7 @@ jobs:
       arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/$(projectName).opencover.xml test/$(projectName)/$(projectName).csproj'
 
 - job: Quality
+  dependsOn: Test
   pool:
     vmImage: '$(poolVmImage)'
   steps:
@@ -79,6 +81,7 @@ jobs:
       testResultsFiles: '**/*.trx'
 
 - job: Pack
+  dependsOn: Test
   pool:
     vmImage: '$(poolVmImage)'
   strategy:
@@ -100,6 +103,7 @@ jobs:
       projects: src/$(projectName)/$(projectName).csproj
 
 - job: Publish
+  dependsOn: Pack
   pool:
     vmImage: '$(poolVmImage)'
   steps:
