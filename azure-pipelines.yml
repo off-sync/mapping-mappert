@@ -1,35 +1,4 @@
 jobs:
-- job: Build
-  pool:
-    vmImage: 'windows-latest'
-  steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core 2.2 SDK'
-    inputs:
-      packageType: sdk
-      version: 2.2.x
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-  
-  - task: DotNetCoreCLI@2
-    displayName: 'Restore Packages'
-    inputs:
-      command: restore
-      projects: '**/*.csproj'
-  
-  - task: SonarCloudPrepare@1
-    displayName: 'Prepare Code Analysis'
-    inputs:
-      SonarCloud: 'SonarCloud'
-      organization: 'off-sync'
-      projectKey: 'off-sync_mapping-mappert'
-      projectName: 'Off-Sync.com Mappert'
-  
-  - task: DotNetCoreCLI@2
-    displayName: 'Build Solution'
-    inputs:
-      command: build
-      arguments: '--configuration Debug'
-
 - job: Test
   dependsOn: Build
   pool:
@@ -45,25 +14,48 @@ jobs:
       Reflection:
         projectName: OffSync.Mapping.Mappert.Reflection.Tests
   steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core 2.2 SDK'
+    inputs:
+      packageType: sdk
+      version: 2.2.x
+      installationPath: $(Agent.ToolsDirectory)/dotnet
   - task: DotNetCoreCLI@2
     displayName: 'Test $(projectName)'
     inputs:
       command: test
       arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/$(projectName).opencover.xml test/$(projectName)/$(projectName).csproj'
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
 
 - job: Quality
   dependsOn: Test
   pool:
     vmImage: 'windows-latest'
   steps:
-  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-    displayName: ReportGenerator
-    inputs:     
-      reports: '$(Build.SourcesDirectory)/coverage/*.opencover.xml'
-      targetdir: '$(Build.SourcesDirectory)/coverage'
-      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
-      assemblyfilters: '-nunit*'
-
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core 2.2 SDK'
+    inputs:
+      packageType: sdk
+      version: 2.2.x
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+  
+  - task: SonarCloudPrepare@1
+    displayName: 'Prepare Code Analysis'
+    inputs:
+      SonarCloud: 'SonarCloud'
+      organization: 'off-sync'
+      projectKey: 'off-sync_mapping-mappert'
+      projectName: 'Off-Sync.com Mappert'
+  
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: build
+      arguments: '--configuration Debug'
+  
   - task: SonarCloudAnalyze@1
     displayName: 'Run Code Analysis'
     inputs: {}
@@ -72,10 +64,13 @@ jobs:
     displayName: 'Publish Code Analysis'
     inputs: {}
 
-  - task: PublishTestResults@2
-    inputs:
-      testRunner: VSTest
-      testResultsFiles: '**/*.trx'
+#  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+#    displayName: ReportGenerator
+#    inputs:     
+#      reports: '$(Build.SourcesDirectory)/coverage/*.opencover.xml'
+#      targetdir: '$(Build.SourcesDirectory)/coverage'
+#      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+#      assemblyfilters: '-nunit*'
 
 - job: Pack
   dependsOn: Test
@@ -92,6 +87,13 @@ jobs:
       Reflection:
         projectName: OffSync.Mapping.Mappert.Reflection
   steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core 2.2 SDK'
+    inputs:
+      packageType: sdk
+      version: 2.2.x
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+
   - task: DotNetCoreCLI@2
     displayName: 'Pack $(projectName)'
     inputs:
