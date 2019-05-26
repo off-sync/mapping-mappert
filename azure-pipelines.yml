@@ -1,114 +1,108 @@
-pool:
-  vmImage: 'windows-latest'
-
 variables:
-  # test
-  testConfiguration: Debug
-  testArguments: '--no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/'
-  mappertTestProject: 'test/OffSync.Mapping.Mappert.Tests/OffSync.Mapping.Mappert.Tests.csproj'
-  dynamicMethodsTestProject: 'test/OffSync.Mapping.Mappert.DynamicMethods.Tests/OffSync.Mapping.Mappert.DynamicMethods.Tests.csproj'
-  practisesTestProject: 'test/OffSync.Mapping.Mappert.Practises.Tests/OffSync.Mapping.Mappert.Practises.Tests.csproj'
-  reflectionTestProject: 'test/OffSync.Mapping.Mappert.Reflection.Tests/OffSync.Mapping.Mappert.Reflection.Tests.csproj'
-  # build
-  buildConfiguration: Release
-  mappertProject: 'src/OffSync.Mapping.Mappert/OffSync.Mapping.Mappert.csproj'
-  dynamicMethodsProject: 'src/OffSync.Mapping.Mappert.DynamicMethods/OffSync.Mapping.Mappert.DynamicMethods.csproj'
-  practisesProject: 'src/OffSync.Mapping.Mappert.Practises/OffSync.Mapping.Mappert.Practises.csproj'
-  reflectionProject: 'src/OffSync.Mapping.Mappert.Reflection/OffSync.Mapping.Mappert.Reflection.csproj'
+  poolVmImage: 'windows-latest'
 
-steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET Core 2.2 SDK'
-  inputs:
-    packageType: sdk
-    version: 2.2.x
-    installationPath: $(Agent.ToolsDirectory)/dotnet
+jobs:
+- job: Build
+  pool:
+    vmImage: '$(poolVmImage)'
+  steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core 2.2 SDK'
+    inputs:
+      packageType: sdk
+      version: 2.2.x
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+  
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore Packages'
+    inputs:
+      command: restore
+      projects: '**/*.csproj'
+  
+  - task: SonarCloudPrepare@1
+    displayName: 'Prepare Code Analysis'
+    inputs:
+      SonarCloud: 'SonarCloud'
+      organization: 'off-sync'
+      projectKey: 'off-sync_mapping-mappert'
+      projectName: 'Off-Sync.com Mappert'
+  
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: build
+      arguments: '--configuration Debug'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Restore Packages'
-  inputs:
-    command: restore
-    projects: '**/*.csproj'
+- job: Test
+  pool:
+    vmImage: '$(poolVmImage)'
+  strategy:
+    matrix:
+      Mappert:
+        projectName: OffSync.Mapping.Mappert.Tests
+      DynamicMethods:
+        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
+      Practises:
+        projectName: OffSync.Mapping.Mappert.Practises.Tests
+      Reflection:
+        projectName: OffSync.Mapping.Mappert.Reflection.Tests
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Test $(projectName)'
+    inputs:
+      command: test
+      arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/$(projectName).opencover.xml test/$(projectName)/$(projectName).csproj'
 
-- task: SonarCloudPrepare@1
-  displayName: 'Prepare Code Analysis'
-  inputs:
-    SonarCloud: 'SonarCloud'
-    organization: 'off-sync'
-    projectKey: 'off-sync_mapping-mappert'
-    projectName: 'Off-Sync.com Mappert'
+- job: Quality
+  pool:
+    vmImage: '$(poolVmImage)'
+  steps:
+  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+    displayName: ReportGenerator
+    inputs:     
+      reports: '$(Build.SourcesDirectory)/coverage/*.opencover.xml'
+      targetdir: '$(Build.SourcesDirectory)/coverage'
+      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+      assemblyfilters: '-nunit*'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build Solution'
-  inputs:
-    command: build
-    arguments: '--configuration $(testConfiguration)'
+  - task: SonarCloudAnalyze@1
+    displayName: 'Run Code Analysis'
+    inputs: {}
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test Mappert'
-  inputs:
-    command: test
-    arguments: '$(testArguments) $(mappertTestProject)'
+  - task: SonarCloudPublish@1
+    displayName: 'Publish Code Analysis'
+    inputs: {}
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test Dynamic Methods'
-  inputs:
-    command: test
-    arguments: '$(testArguments) $(dynamicMethodsTestProject)'
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test Practises'
-  inputs:
-    command: test
-    arguments: '$(testArguments) $(practisesTestProject)'
+- job: Pack
+  pool:
+    vmImage: '$(poolVmImage)'
+  strategy:
+    matrix:
+      Mappert:
+        projectName: OffSync.Mapping.Mappert
+      DynamicMethods:
+        projectName: OffSync.Mapping.Mappert.DynamicMethods
+      Practises:
+        projectName: OffSync.Mapping.Mappert.Practises
+      Reflection:
+        projectName: OffSync.Mapping.Mappert.Reflection
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Pack $(projectName)'
+    inputs:
+      command: pack
+      arguments: '--configuration Release'
+      projects: src/$(projectName)/$(projectName).csproj
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test Reflection'
-  inputs:
-    command: test
-    arguments: '$(testArguments) $(reflectionTestProject)'
-
-- task: SonarCloudAnalyze@1
-  displayName: 'Run Code Analysis'
-  inputs: {}
-
-- task: SonarCloudPublish@1
-  displayName: 'Publish Code Analysis'
-  inputs: {}
-
-- task: PublishTestResults@2
-  inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Pack OffSync.Mapping.Mappert'
-  inputs:
-    command: pack
-    arguments: '--configuration $(buildConfiguration)'
-    projects: $(mappertProject)
-
-- task: DotNetCoreCLI@2
-  displayName: 'Pack OffSync.Mapping.Mappert.DynamicMethods'
-  inputs:
-    command: pack
-    arguments: '--configuration $(buildConfiguration)'
-    projects: $(dynamicMethodsProject)
-
-- task: DotNetCoreCLI@2
-  displayName: 'Pack OffSync.Mapping.Mappert.Practises'
-  inputs:
-    command: pack
-    arguments: '--configuration $(buildConfiguration)'
-    projects: $(practisesProject)
-
-- task: DotNetCoreCLI@2
-  displayName: 'Pack OffSync.Mapping.Mappert.Reflection'
-  inputs:
-    command: pack
-    arguments: '--configuration $(buildConfiguration)'
-    projects: $(reflectionProject)
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Build Artifacts'
-  inputs: {}
+- job: Publish
+  pool:
+    vmImage: '$(poolVmImage)'
+  steps:
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Build Artifacts'
+    inputs: {}
