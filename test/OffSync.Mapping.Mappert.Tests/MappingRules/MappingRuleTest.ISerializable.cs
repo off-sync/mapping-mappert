@@ -24,6 +24,7 @@ namespace OffSync.Mapping.Mappert.Tests.MappingRules
                 .WithBuilder(builder);
 
             var formatter = new BinaryFormatter();
+
             var stream = new MemoryStream();
 
             formatter.Serialize(

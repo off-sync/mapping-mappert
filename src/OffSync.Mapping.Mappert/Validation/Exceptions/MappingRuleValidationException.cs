@@ -40,7 +40,7 @@ namespace OffSync.Mapping.Mappert.Validation.Exceptions
 
             info.AddValue(
                 nameof(MappingRule),
-                typeof(MappingRule));
+                MappingRule);
         }
     }
 }

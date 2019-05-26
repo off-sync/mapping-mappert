@@ -87,12 +87,17 @@ namespace OffSync.Mapping.Mappert.MappingRules
         private static string SerializeType(
             Type type)
         {
-            return type.AssemblyQualifiedName;
+            return type?.AssemblyQualifiedName;
         }
 
         private static Type DeserializeType(
             string type)
         {
+            if (type == null)
+            {
+                return null;
+            }
+
             return System.Type.GetType(type);
         }
     }
