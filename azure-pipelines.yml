@@ -1,0 +1,104 @@
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: Release
+  testArguments: '--logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/'
+  mappertProject: 'src/OffSync.Mapping.Mappert/OffSync.Mapping.Mappert.csproj'
+  mappertTestProject: 'test/OffSync.Mapping.Mappert.Tests/OffSync.Mapping.Mappert.Tests.csproj'
+  dynamicMethodsProject: 'src/OffSync.Mapping.Mappert.DynamicMethods/OffSync.Mapping.Mappert.DynamicMethods.csproj'
+  dynamicMethodsTestProject: 'test/OffSync.Mapping.Mappert.DynamicMethods.Tests/OffSync.Mapping.Mappert.DynamicMethods.Tests.csproj'
+  practisesProject: 'src/OffSync.Mapping.Mappert.Practises/OffSync.Mapping.Mappert.Practises.csproj'
+  practisesTestProject: 'test/OffSync.Mapping.Mappert.Practises.Tests/OffSync.Mapping.Mappert.Practises.Tests.csproj'
+  reflectionProject: 'src/OffSync.Mapping.Mappert.Reflection/OffSync.Mapping.Mappert.Reflection.csproj'
+  reflectionTestProject: 'test/OffSync.Mapping.Mappert.Reflection.Tests/OffSync.Mapping.Mappert.Reflection.Tests.csproj'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Restore Packages'
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+
+- task: SonarCloudPrepare@1
+  displayName: 'Prepare Code Analysis'
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'off-sync'
+    projectKey: 'off-sync_mapping-mappert'
+    projectName: 'Off-Sync.com Mappert'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build Solution'
+  inputs:
+    command: build
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Test Mappert'
+  inputs:
+    command: test
+    arguments: '$(testArguments) $(mappertTestProject)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Test Dynamic Methods'
+  inputs:
+    command: test
+    arguments: '$(testArguments) $(dynamicMethodsTestProject)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Test Practises'
+  inputs:
+    command: test
+    arguments: '$(testArguments) $(practisesTestProject)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Test Reflection'
+  inputs:
+    command: test
+    arguments: '$(testArguments) $(reflectionTestProject)'
+
+- task: SonarCloudAnalyze@1
+  displayName: 'Run Code Analysis'
+  inputs: {}
+
+- task: SonarCloudPublish@1
+  displayName: 'Publish Code Analysis'
+  inputs: {}
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack OffSync.Mapping.Mappert'
+  inputs:
+    command: pack
+    arguments: '--configuration $(buildConfiguration) --no-build'
+    projects: $(mappertProject)
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack OffSync.Mapping.Mappert.DynamicMethods'
+  inputs:
+    command: pack
+    arguments: '--configuration $(buildConfiguration) --no-build'
+    projects: $(dynamicMethodsProject)
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack OffSync.Mapping.Mappert.Practises'
+  inputs:
+    command: pack
+    arguments: '--configuration $(buildConfiguration) --no-build'
+    projects: $(practisesProject)
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack OffSync.Mapping.Mappert.Reflection'
+  inputs:
+    command: pack
+    arguments: '--configuration $(buildConfiguration) --no-build'
+    projects: $(reflectionProject)
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs: {}
