@@ -23,12 +23,8 @@ jobs:
     displayName: 'Test $(projectName)'
     inputs:
       command: test
-      arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/$(projectName).opencover.xml test/$(projectName)/$(projectName).csproj'
-  - task: PublishTestResults@2
-    inputs:
-      testRunner: VSTest
-      testResultsFiles: '**/*.trx'
-      mergeTestResults: true
+      arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/$(projectName).opencover.xml test/$(projectName)/$(projectName).csproj'
+      publishTestResults: true
 
 - job: Quality
   dependsOn: Test
