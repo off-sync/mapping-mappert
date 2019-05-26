@@ -14,6 +14,13 @@ variables:
   reflectionTestProject: 'test/OffSync.Mapping.Mappert.Reflection.Tests/OffSync.Mapping.Mappert.Reflection.Tests.csproj'
 
 steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET Core 2.2 SDK'
+  inputs:
+    packageType: sdk
+    version: 2.2.x
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
 - task: DotNetCoreCLI@2
   displayName: 'Restore Packages'
   inputs:
