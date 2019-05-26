@@ -7,23 +7,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.2|AnyCPU'">
-    <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.Benchmarks.ruleset</CodeAnalysisRuleSet>
-    <DefineConstants>TRACE;PROFILERT</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.2|AnyCPU'">
-    <CodeAnalysisRuleSet>OffSync.Mapping.Mappert.Benchmarks.ruleset</CodeAnalysisRuleSet>
-    <DefineConstants>TRACE;PROFILERT</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\mapping-practises\src\OffSync.Mapping.Practises\OffSync.Mapping.Practises.csproj" />
     <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert.DynamicMethods\OffSync.Mapping.Mappert.DynamicMethods.csproj" />
     <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert\OffSync.Mapping.Mappert.csproj" />
   </ItemGroup>
