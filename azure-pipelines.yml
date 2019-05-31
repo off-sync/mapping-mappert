@@ -1,43 +1,55 @@
 jobs:
-- job: Test
+- job: TestWindows
   pool:
-    vmImage: 'windows-latest'
+    vmImage: 'windows-2019'
   strategy:
     matrix:
-      Mappert:
+      Mappert_netcoreapp2.2:
         projectName: OffSync.Mapping.Mappert.Tests
-      DynamicMethods:
+        framework: netcoreapp2.2
+      Mappert_net461:
+        projectName: OffSync.Mapping.Mappert.Tests
+        framework: net461
+      DynamicMethods_netcoreapp2.2:
         projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
-      Practises:
+        framework: netcoreapp2.2
+      DynamicMethods_net461:
+        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
+        framework: net461
+      Practises_netcoreapp2.2:
         projectName: OffSync.Mapping.Mappert.Practises.Tests
-      Reflection:
+        framework: netcoreapp2.2
+      Practises_net461:
+        projectName: OffSync.Mapping.Mappert.Practises.Tests
+        framework: net461
+      Reflection_netcoreapp2.2:
         projectName: OffSync.Mapping.Mappert.Reflection.Tests
+        framework: netcoreapp2.2
+      Reflection_net461:
+        projectName: OffSync.Mapping.Mappert.Reflection.Tests
+        framework: net461
   steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core 2.2 SDK'
-    inputs:
-      packageType: sdk
-      version: 2.2.x
-      installationPath: $(Agent.ToolsDirectory)/dotnet
   - task: DotNetCoreCLI@2
     displayName: 'Test $(projectName)'
     inputs:
       command: test
-      arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/$(projectName).opencover.xml test/$(projectName)/$(projectName).csproj'
+      arguments: '--framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).opencover.xml test/$(projectName)/$(projectName).csproj'
       publishTestResults: true
 
-- job: Quality
-  dependsOn: Test
-  pool:
-    vmImage: 'windows-latest'
-  steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core 2.2 SDK'
+  - task: PublishPipelineArtifact@0
     inputs:
-      packageType: sdk
-      version: 2.2.x
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-  
+      artifactName: 'TestWindows-TestResults-$(projectName)-$(framework)'
+      targetPath: '$(Agent.TempDirectory)/TestResults'
+
+- job: Quality
+  dependsOn: [ TestWindows ]
+  pool:
+    vmImage: 'windows-2019'
+  steps:
+  - task: DownloadPipelineArtifact@1
+    inputs:
+      downloadPath: '$(Agent.TempDirectory)/TestResults'
+
   - task: SonarCloudPrepare@1
     displayName: 'Prepare Code Analysis'
     inputs:
@@ -45,7 +57,10 @@ jobs:
       organization: 'off-sync'
       projectKey: 'off-sync_mapping-mappert'
       projectName: 'Off-Sync.com Mappert'
-  
+      extraProperties: |
+        sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.opencover.xml
+        sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.trx
+
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
     inputs:
@@ -54,24 +69,28 @@ jobs:
   
   - task: SonarCloudAnalyze@1
     displayName: 'Run Code Analysis'
-    inputs: {}
 
   - task: SonarCloudPublish@1
     displayName: 'Publish Code Analysis'
-    inputs: {}
 
-#  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-#    displayName: ReportGenerator
-#    inputs:     
-#      reports: '$(Build.SourcesDirectory)/coverage/*.opencover.xml'
-#      targetdir: '$(Build.SourcesDirectory)/coverage'
-#      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
-#      assemblyfilters: '-nunit*'
+  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+    displayName: ReportGenerator
+    inputs:     
+      reports: '$(Agent.TempDirectory)/TestResults/**/*.opencover.xml'
+      targetdir: '$(Agent.TempDirectory)/Reports'
+      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+      assemblyfilters: '-nunit*'
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      summaryFileLocation: '$(Agent.TempDirectory)/Reports/Cobertura.xml'
+      reportDirectory: '$(Agent.TempDirectory)/Reports'
+      codecoverageTool: cobertura
 
 - job: Pack
-  dependsOn: Test
+  dependsOn: [ TestWindows ]
   pool:
-    vmImage: 'windows-latest'
+    vmImage: 'windows-2019'
   strategy:
     matrix:
       Mappert:
@@ -80,16 +99,7 @@ jobs:
         projectName: OffSync.Mapping.Mappert.DynamicMethods
       Practises:
         projectName: OffSync.Mapping.Mappert.Practises
-      Reflection:
-        projectName: OffSync.Mapping.Mappert.Reflection
   steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core 2.2 SDK'
-    inputs:
-      packageType: sdk
-      version: 2.2.x
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-
   - task: DotNetCoreCLI@2
     displayName: 'Pack $(projectName)'
     inputs:
@@ -97,11 +107,5 @@ jobs:
       arguments: '--configuration Release'
       projects: src/$(projectName)/$(projectName).csproj
 
-- job: Publish
-  dependsOn: Pack
-  pool:
-    vmImage: 'windows-latest'
-  steps:
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Build Artifacts'
-    inputs: {}
