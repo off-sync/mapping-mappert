@@ -12,12 +12,12 @@ Job=Core  Runtime=Core
 
 |           Method | MappingDelegateBuilder |       Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
 |----------------- |----------------------- |-----------:|----------:|----------:|------:|--------:|-----:|
-|         **MapEmpty** |             **Reflection** |   **132.0 ns** | **0.4217 ns** | **0.3944 ns** |  **1.00** |    **0.00** |    **1** |
-|        MapSimple |             Reflection |   808.4 ns | 0.8801 ns | 0.7802 ns |  6.12 |    0.02 |    2 |
-| MapArraySplitter |             Reflection | 1,342.9 ns | 2.9925 ns | 2.6528 ns | 10.17 |    0.04 |    3 |
-| MapTupleSplitter |             Reflection | 1,577.1 ns | 3.0172 ns | 2.8223 ns | 11.95 |    0.03 |    4 |
+|         **MapEmpty** |             **Reflection** |   **150.1 ns** | **0.1731 ns** | **0.1619 ns** |  **1.00** |    **0.00** |    **1** |
+|        MapSimple |             Reflection |   820.2 ns | 4.5959 ns | 4.2990 ns |  5.46 |    0.03 |    2 |
+| MapArraySplitter |             Reflection | 1,225.5 ns | 0.6744 ns | 0.5632 ns |  8.17 |    0.01 |    3 |
+| MapTupleSplitter |             Reflection | 1,571.2 ns | 9.6144 ns | 8.9933 ns | 10.47 |    0.06 |    4 |
 |                  |                        |            |           |           |       |         |      |
-|         **MapEmpty** |          **DynamicMethod** |   **131.4 ns** | **0.2893 ns** | **0.2564 ns** |  **1.00** |    **0.00** |    **1** |
-|        MapSimple |          DynamicMethod |   130.1 ns | 0.2000 ns | 0.1871 ns |  0.99 |    0.00 |    1 |
-| MapArraySplitter |          DynamicMethod |   236.6 ns | 0.5836 ns | 0.5459 ns |  1.80 |    0.01 |    3 |
-| MapTupleSplitter |          DynamicMethod |   222.3 ns | 0.5963 ns | 0.5578 ns |  1.69 |    0.00 |    2 |
+|         **MapEmpty** |          **DynamicMethod** |   **133.2 ns** | **0.1891 ns** | **0.1579 ns** |  **1.00** |    **0.00** |    **2** |
+|        MapSimple |          DynamicMethod |   129.0 ns | 0.2428 ns | 0.2027 ns |  0.97 |    0.00 |    1 |
+| MapArraySplitter |          DynamicMethod |   236.9 ns | 0.5915 ns | 0.5533 ns |  1.78 |    0.01 |    4 |
+| MapTupleSplitter |          DynamicMethod |   218.9 ns | 0.3969 ns | 0.3713 ns |  1.64 |    0.00 |    3 |

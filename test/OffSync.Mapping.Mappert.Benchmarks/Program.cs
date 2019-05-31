@@ -9,10 +9,6 @@ namespace OffSync.Mapping.Mappert.Benchmarks
         static void Main(
             string[] args)
         {
-#if !PROFILER
-            BenchmarkRunner.Run<MapperPerformance>();
-#endif
-
 #if PROFILER
             var mapperPerformance = new MapperPerformance();
 
@@ -22,6 +18,8 @@ namespace OffSync.Mapping.Mappert.Benchmarks
             {
                 mapperPerformance.MapTupleSplitter();
             }
+#else
+            BenchmarkRunner.Run<MapperPerformance>();
 #endif
         }
     }
