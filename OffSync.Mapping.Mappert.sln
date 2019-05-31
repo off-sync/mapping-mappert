@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Benchmarks", "test\OffSync.Mapping.Mappert.Benchmarks\OffSync.Mapping.Mappert.Benchmarks.csproj", "{7340C24C-A8D8-45BD-8EC6-3AB2866DA0F8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{10E4277B-E0F4-446C-B154-E381BD352177}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1C6AD248-DD37-4165-BC4F-496E25E0AE4F}"
 EndProject
@@ -31,6 +34,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Practises.Tests", "test\OffSync.Mapping.Mappert.Practises.Tests\OffSync.Mapping.Mappert.Practises.Tests.csproj", "{F35290D2-0126-4C3E-B5BB-E77D96D443FA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OffSync.Mapping.Mappert.Tests.Models", "test\OffSync.Mapping.Mappert.Tests.Models\OffSync.Mapping.Mappert.Tests.Models.csproj", "{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DFC3AFDE-8516-4B6B-9221-99B15E5741D8}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

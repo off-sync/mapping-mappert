@@ -1,8 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup Label="Metadata">
+    <Description>Off-Sync.com Mappert - Fast and flexible object mapping for C#.</Description>
+    <PackageTags>mapper;mapping;mappert;reflection</PackageTags>
+    <Title>Off-Sync.com Mapping Mappert</Title>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OffSync.Mapping.Mappert.Practises\OffSync.Mapping.Mappert.Practises.csproj" />
-    <ProjectReference Include="..\OffSync.Mapping.Mappert.Reflection\OffSync.Mapping.Mappert.Reflection.csproj" />
+    <ProjectReference Include="..\OffSync.Mapping.Mappert.Reflection\OffSync.Mapping.Mappert.Reflection.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
