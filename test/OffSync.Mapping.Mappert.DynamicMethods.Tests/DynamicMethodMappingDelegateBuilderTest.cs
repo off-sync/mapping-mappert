@@ -3,6 +3,7 @@
 using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.MappingRules;
+using OffSync.Mapping.Mappert.Practises.Common;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Tests.Models;
 
@@ -17,6 +18,16 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Tests
         public void SetUp()
         {
             _sut = new DynamicMethodMappingDelegateBuilder();
+        }
+
+        [Test]
+        public void IsRegistered()
+        {
+            var builder = ConfigurationUtil.GetRegisteredMappingDelegateBuilder();
+
+            Assert.That(
+                builder,
+                Is.TypeOf<DynamicMethodMappingDelegateBuilder>());
         }
 
         [Test]

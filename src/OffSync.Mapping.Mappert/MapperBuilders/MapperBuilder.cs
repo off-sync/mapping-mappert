@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Mappert.Practises.Common;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
-using OffSync.Mapping.Mappert.Reflection;
 
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
@@ -83,7 +83,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         {
             if (_mappingDelegateBuilder == null)
             {
-                _mappingDelegateBuilder = new ReflectionMappingDelegateBuilder();
+                _mappingDelegateBuilder = ConfigurationUtil.GetRegisteredMappingDelegateBuilder();
             }
 
             return _mappingDelegateBuilder.CreateMappingDelegate<TSource, TTarget>(mappingRules);
