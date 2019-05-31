@@ -29,6 +29,13 @@ jobs:
         projectName: OffSync.Mapping.Mappert.Reflection.Tests
         framework: net461
   steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk'
+    inputs:
+      packageType: sdk
+      version: 2.2.300
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+
   - task: DotNetCoreCLI@2
     displayName: 'Test $(projectName)'
     inputs:
@@ -60,6 +67,13 @@ jobs:
       extraProperties: |
         sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.opencover.xml
         sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.trx
+
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk'
+    inputs:
+      packageType: sdk
+      version: 2.2.300
+      installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
@@ -100,6 +114,13 @@ jobs:
       Practises:
         projectName: OffSync.Mapping.Mappert.Practises
   steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk'
+    inputs:
+      packageType: sdk
+      version: 2.2.300
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+
   - task: DotNetCoreCLI@2
     displayName: 'Pack $(projectName)'
     inputs:
