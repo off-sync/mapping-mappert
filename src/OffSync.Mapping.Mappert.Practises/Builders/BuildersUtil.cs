@@ -106,8 +106,16 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
             }
 
             // check if return type implements matching value tuple
+            var valueTupleTypeName =
+#if NET461
+                // value tuple is defined in a separate assembly
+                $"System.ValueTuple`{targetTypes.Length},System.ValueTuple";
+#else
+                $"System.ValueTuple`{targetTypes.Length}";
+#endif
+
             var valueTupleType = Type
-                .GetType($"System.ValueTuple`{targetTypes.Length}")
+                .GetType(valueTupleTypeName)
                 .MakeGenericType(targetTypes);
 
             if (returnType == valueTupleType)
