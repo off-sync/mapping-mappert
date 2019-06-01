@@ -13,4 +13,8 @@
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
 </Project>

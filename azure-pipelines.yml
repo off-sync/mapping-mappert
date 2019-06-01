@@ -38,12 +38,12 @@ jobs:
 #        projectName: OffSync.Mapping.Mappert.Reflection.Tests
 #        framework: net461
   steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core sdk'
-    inputs:
-      packageType: sdk
-      version: 2.2.105
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+#  - task: UseDotNet@2
+#    displayName: 'Use .NET Core sdk'
+#    inputs:
+#      packageType: sdk
+#      version: 2.2.x
+#      installationPath: $(Agent.ToolsDirectory)/dotnet
 
 #  - task: DotNetCoreCLI@2
 #    displayName: 'Test $(projectName)'
@@ -56,7 +56,7 @@ jobs:
     displayName: 'Build Solution'
     inputs:
       command: build
-      arguments: '--configuration Release --framework $(framework)'
+      arguments: '--configuration Release'
 
   - task: DotNetCoreCLI@2
     displayName: 'Test'
