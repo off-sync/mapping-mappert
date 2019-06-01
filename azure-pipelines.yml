@@ -42,7 +42,7 @@ jobs:
     displayName: 'Use .NET Core sdk'
     inputs:
       packageType: sdk
-      version: 2.2.300
+      version: 2.2.105
       installationPath: $(Agent.ToolsDirectory)/dotnet
 
 #  - task: DotNetCoreCLI@2
@@ -56,13 +56,13 @@ jobs:
     displayName: 'Build Solution'
     inputs:
       command: build
-      arguments: '--configuration Release'
+      arguments: '--configuration Release --framework $(framework)'
 
   - task: DotNetCoreCLI@2
     displayName: 'Test'
     inputs:
       command: test
-      arguments: '--configuration Release --framework $(framework) /p:CollectCoverage=true /p:CoverletOutputFormat=opencover'
+      arguments: '--configuration Release --framework $(framework) /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/'
       projects: test/**/*.csproj
       nobuild: true
 
