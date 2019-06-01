@@ -4,7 +4,7 @@ parameters:
 
 steps:
 - task: DotNetCoreCLI@2
-  displayName: 'Test'
+  displayName: 'Test ${{ parameters.projectName }}'
   inputs:
     command: test
     arguments: '--framework ${{ parameters.framework }} --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/${{ parameters.projectName }}-${{ parameters.framework }}.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/${{ parameters.projectName }}-${{ parameters.framework }}.opencover.xml test/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj'
