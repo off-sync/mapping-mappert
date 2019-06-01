@@ -6,6 +6,4 @@ steps:
   displayName: 'Pack ${{ parameters.projectName }}'
   inputs:
     command: pack
-    arguments: '--configuration Release'
-    projects: src/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj
-    nobuild: true
+    arguments: '--configuration Release src/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj'

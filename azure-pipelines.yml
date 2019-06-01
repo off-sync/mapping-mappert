@@ -95,12 +95,6 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
-  - task: DotNetCoreCLI@2
-    displayName: 'Build Solution'
-    inputs:
-      command: build
-      arguments: '--configuration Release'
-
   - template: .azure-pipelines/pack-project-step-template.yml
     parameters:
       projectName: OffSync.Mapping.Mappert
