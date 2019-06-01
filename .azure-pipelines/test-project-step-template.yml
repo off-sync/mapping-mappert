@@ -9,3 +9,4 @@ steps:
     command: test
     arguments: '--framework ${{ parameters.framework }} --logger "trx;LogFileName=$(Build.ArtifactStagingDirectory)/TestResults/${{ parameters.projectName }}-${{ parameters.framework }}.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.ArtifactStagingDirectory)/TestResults/${{ parameters.projectName }}-${{ parameters.framework }}.opencover.xml test/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj'
     nobuild: true
+    publishTestResults: false
