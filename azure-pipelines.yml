@@ -19,22 +19,22 @@ jobs:
       command: build
       arguments: '--configuration Release'
 
-  - template: .azure-pipelinestest-project-step-template.yml
+  - template: .azure-pipelines/test-project-step-template.yml
     parameters:
       framework: $(framework)
       projectName: OffSync.Mapping.Mappert.Tests
 
-  - template: .azure-pipelinestest-project-step-template.yml
+  - template: .azure-pipelines/test-project-step-template.yml
     parameters:
       framework: $(framework)
       projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
 
-  - template: .azure-pipelinestest-project-step-template.yml
+  - template: .azure-pipelines/test-project-step-template.yml
     parameters:
       framework: $(framework)
       projectName: OffSync.Mapping.Mappert.Practises.Tests
 
-  - template: .azure-pipelinestest-project-step-template.yml
+  - template: .azure-pipelines/test-project-step-template.yml
     parameters:
       framework: $(framework)
       projectName: OffSync.Mapping.Mappert.Reflection.Tests
