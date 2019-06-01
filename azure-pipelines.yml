@@ -42,7 +42,7 @@ jobs:
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'TestWindows-TestResults-$(framework)'
-      targetPath: '$(Agent.TempDirectory)/TestResults'
+      targetPath: '$(Build.ArtifactStagingDirectory)/TestResults'
 
 - job: Quality
   dependsOn: [ TestWindows ]
