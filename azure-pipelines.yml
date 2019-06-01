@@ -1,33 +1,41 @@
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
 jobs:
 - job: TestWindows
   pool:
     vmImage: 'windows-2019'
   strategy:
     matrix:
-      Mappert_netcoreapp2.2:
-        projectName: OffSync.Mapping.Mappert.Tests
+      NetCoreApp2_2:
         framework: netcoreapp2.2
-      Mappert_net461:
-        projectName: OffSync.Mapping.Mappert.Tests
+      Net461:
         framework: net461
-      DynamicMethods_netcoreapp2.2:
-        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
-        framework: netcoreapp2.2
-      DynamicMethods_net461:
-        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
-        framework: net461
-      Practises_netcoreapp2.2:
-        projectName: OffSync.Mapping.Mappert.Practises.Tests
-        framework: netcoreapp2.2
-      Practises_net461:
-        projectName: OffSync.Mapping.Mappert.Practises.Tests
-        framework: net461
-      Reflection_netcoreapp2.2:
-        projectName: OffSync.Mapping.Mappert.Reflection.Tests
-        framework: netcoreapp2.2
-      Reflection_net461:
-        projectName: OffSync.Mapping.Mappert.Reflection.Tests
-        framework: net461
+
+#      Mappert_netcoreapp2.2:
+#        projectName: OffSync.Mapping.Mappert.Tests
+#        framework: netcoreapp2.2
+#      Mappert_net461:
+#        projectName: OffSync.Mapping.Mappert.Tests
+#        framework: net461
+#      DynamicMethods_netcoreapp2.2:
+#        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
+#        framework: netcoreapp2.2
+#      DynamicMethods_net461:
+#        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
+#        framework: net461
+#      Practises_netcoreapp2.2:
+#        projectName: OffSync.Mapping.Mappert.Practises.Tests
+#        framework: netcoreapp2.2
+#      Practises_net461:
+#        projectName: OffSync.Mapping.Mappert.Practises.Tests
+#        framework: net461
+#      Reflection_netcoreapp2.2:
+#        projectName: OffSync.Mapping.Mappert.Reflection.Tests
+#        framework: netcoreapp2.2
+#      Reflection_net461:
+#        projectName: OffSync.Mapping.Mappert.Reflection.Tests
+#        framework: net461
   steps:
   - task: UseDotNet@2
     displayName: 'Use .NET Core sdk'
@@ -36,12 +44,26 @@ jobs:
       version: 2.2.300
       installationPath: $(Agent.ToolsDirectory)/dotnet
 
+#  - task: DotNetCoreCLI@2
+#    displayName: 'Test $(projectName)'
+#    inputs:
+#      command: test
+#      arguments: '--framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).opencover.xml test/$(projectName)/$(projectName).csproj'
+#      publishTestResults: true
+
   - task: DotNetCoreCLI@2
-    displayName: 'Test $(projectName)'
+    displayName: 'Build Solution'
+    inputs:
+      command: build
+      arguments: '--configuration Release'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Test'
     inputs:
       command: test
-      arguments: '--framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).opencover.xml test/$(projectName)/$(projectName).csproj'
-      publishTestResults: true
+      arguments: '--configuration Release --framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(framework).opencover.xml
+      projects: test/**/*.csproj
+      nobuild: true
 
   - task: PublishPipelineArtifact@0
     inputs:
