@@ -12,63 +12,36 @@ jobs:
         framework: netcoreapp2.2
       Net461:
         framework: net461
-
-#      Mappert_netcoreapp2.2:
-#        projectName: OffSync.Mapping.Mappert.Tests
-#        framework: netcoreapp2.2
-#      Mappert_net461:
-#        projectName: OffSync.Mapping.Mappert.Tests
-#        framework: net461
-#      DynamicMethods_netcoreapp2.2:
-#        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
-#        framework: netcoreapp2.2
-#      DynamicMethods_net461:
-#        projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
-#        framework: net461
-#      Practises_netcoreapp2.2:
-#        projectName: OffSync.Mapping.Mappert.Practises.Tests
-#        framework: netcoreapp2.2
-#      Practises_net461:
-#        projectName: OffSync.Mapping.Mappert.Practises.Tests
-#        framework: net461
-#      Reflection_netcoreapp2.2:
-#        projectName: OffSync.Mapping.Mappert.Reflection.Tests
-#        framework: netcoreapp2.2
-#      Reflection_net461:
-#        projectName: OffSync.Mapping.Mappert.Reflection.Tests
-#        framework: net461
   steps:
-#  - task: UseDotNet@2
-#    displayName: 'Use .NET Core sdk'
-#    inputs:
-#      packageType: sdk
-#      version: 2.2.x
-#      installationPath: $(Agent.ToolsDirectory)/dotnet
-
-#  - task: DotNetCoreCLI@2
-#    displayName: 'Test $(projectName)'
-#    inputs:
-#      command: test
-#      arguments: '--framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(projectName)-$(framework).opencover.xml test/$(projectName)/$(projectName).csproj'
-#      publishTestResults: true
-
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
     inputs:
       command: build
       arguments: '--configuration Release'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Test'
-    inputs:
-      command: test
-      arguments: '--configuration Release --framework $(framework) /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/'
-      projects: test/**/*.csproj
-      nobuild: true
+  - template: .azure-pipelinestest-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.Tests
+
+  - template: .azure-pipelinestest-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
+
+  - template: .azure-pipelinestest-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.Practises.Tests
+
+  - template: .azure-pipelinestest-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.Reflection.Tests
 
   - task: PublishPipelineArtifact@0
     inputs:
-      artifactName: 'TestWindows-TestResults-$(projectName)-$(framework)'
+      artifactName: 'TestWindows-TestResults-$(framework)'
       targetPath: '$(Agent.TempDirectory)/TestResults'
 
 - job: Quality
@@ -90,13 +63,6 @@ jobs:
       extraProperties: |
         sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.opencover.xml
         sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.trx
-
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core sdk'
-    inputs:
-      packageType: sdk
-      version: 2.2.300
-      installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
@@ -125,7 +91,7 @@ jobs:
       codecoverageTool: cobertura
 
 - job: Pack
-  dependsOn: [ TestWindows ]
+  dependsOn: [ Quality ]
   pool:
     vmImage: 'windows-2019'
   strategy:
@@ -137,13 +103,6 @@ jobs:
       Practises:
         projectName: OffSync.Mapping.Mappert.Practises
   steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core sdk'
-    inputs:
-      packageType: sdk
-      version: 2.2.300
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-
   - task: DotNetCoreCLI@2
     displayName: 'Pack $(projectName)'
     inputs:
