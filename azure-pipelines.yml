@@ -61,7 +61,7 @@ jobs:
     displayName: 'Test'
     inputs:
       command: test
-      arguments: '--configuration Release --framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(framework).opencover.xml
+      arguments: '--configuration Release --framework $(framework) --logger "trx;LogFileName=$(Agent.TempDirectory)/TestResults/$(framework).trx" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Agent.TempDirectory)/TestResults/$(framework).opencover.xml'
       projects: test/**/*.csproj
       nobuild: true
 
