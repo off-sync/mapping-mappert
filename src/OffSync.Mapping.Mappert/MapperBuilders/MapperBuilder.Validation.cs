@@ -89,60 +89,14 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         {
             foreach (var validator in GetValidators())
             {
-                var ruleValidator = validator as IMappingRuleValidator;
-                if (ruleValidator != null)
+                if (validator is IMappingRuleValidator ruleValidator)
                 {
-                    foreach (var mappingRule in _mappingRules)
-                    {
-                        var result = ruleValidator.Validate<TSource, TTarget>(mappingRule);
-
-                        switch (result.Result)
-                        {
-                            case MappingRuleValidationResults.Invalid:
-                                throw new MappingRuleValidationException(
-                                    mappingRule,
-                                    result.Message,
-                                    result.Exception);
-
-                            case MappingRuleValidationResults.SetBuilder:
-                                mappingRule.WithBuilder(result.Builder);
-
-                                break;
-                        }
-                    }
+                    ValidateMappingRules(ruleValidator);
                 }
 
-                var ruleSetValidator = validator as IMappingRuleSetValidator<MappingRule>;
-                if (ruleSetValidator != null)
+                if (validator is IMappingRuleSetValidator<MappingRule> ruleSetValidator)
                 {
-                    var result = ruleSetValidator.Validate<TSource, TTarget>(_mappingRules);
-
-                    switch (result.Result)
-                    {
-                        case MappingRuleSetValidationResults.Invalid:
-                            throw new MappingRuleSetValidationException(
-                                result.Message,
-                                result.Exception);
-
-                        case MappingRuleSetValidationResults.UpdateRules:
-                            if (result.RulesToAdd.Any())
-                            {
-                                foreach (var rule in result.RulesToAdd.ToArray())
-                                {
-                                    _mappingRules.Add(rule);
-                                }
-                            }
-
-                            if (result.RulesToRemove.Any())
-                            {
-                                foreach (var rule in result.RulesToRemove.ToArray())
-                                {
-                                    _mappingRules.Remove(rule);
-                                }
-                            }
-
-                            break;
-                    }
+                    ValidateMappingRules(ruleSetValidator);
                 }
             }
         }
@@ -155,6 +109,62 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             }
 
             return MapperBuilder.DefaultValidators;
+        }
+
+        private void ValidateMappingRules(
+            IMappingRuleValidator ruleValidator)
+        {
+            foreach (var mappingRule in _mappingRules)
+            {
+                var result = ruleValidator.Validate<TSource, TTarget>(mappingRule);
+
+                switch (result.Result)
+                {
+                    case MappingRuleValidationResults.Invalid:
+                        throw new MappingRuleValidationException(
+                            mappingRule,
+                            result.Message,
+                            result.Exception);
+
+                    case MappingRuleValidationResults.SetBuilder:
+                        mappingRule.WithBuilder(result.Builder);
+
+                        break;
+                }
+            }
+        }
+
+        private void ValidateMappingRules(
+            IMappingRuleSetValidator<MappingRule> ruleSetValidator)
+        {
+            var result = ruleSetValidator.Validate<TSource, TTarget>(_mappingRules);
+
+            switch (result.Result)
+            {
+                case MappingRuleSetValidationResults.Invalid:
+                    throw new MappingRuleSetValidationException(
+                        result.Message,
+                        result.Exception);
+
+                case MappingRuleSetValidationResults.UpdateRules:
+                    if (result.RulesToAdd.Any())
+                    {
+                        foreach (var rule in result.RulesToAdd.ToArray())
+                        {
+                            _mappingRules.Add(rule);
+                        }
+                    }
+
+                    if (result.RulesToRemove.Any())
+                    {
+                        foreach (var rule in result.RulesToRemove.ToArray())
+                        {
+                            _mappingRules.Remove(rule);
+                        }
+                    }
+
+                    break;
+            }
         }
     }
 }
