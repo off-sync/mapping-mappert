@@ -68,7 +68,7 @@ jobs:
       extraProperties: |
         sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.opencover.xml
         sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.trx
-        sonar.coverage.exclusions=src/OffSync.Mapping.Mappert.Benchmarks/**/*
+        sonar.coverage.exclusions=test/OffSync.Mapping.Mappert.Benchmarks/**/*
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Solution'
