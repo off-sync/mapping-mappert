@@ -1,6 +1,7 @@
 ﻿using System;
 
 using OffSync.Mapping.Mappert.MapperBuilders;
+using OffSync.Mapping.Mappert.Practises.Mapping;
 using OffSync.Mapping.Practises;
 
 namespace OffSync.Mapping.Mappert
@@ -24,14 +25,27 @@ namespace OffSync.Mapping.Mappert
         public TTarget Map(
             TSource source)
         {
-            var mappingDelegate = GetValidatedMappingDelegate();
-
             if (source == null)
             {
                 return default(TTarget);
             }
 
+            if (MappingContext.Current.TryGetMapping(
+                source,
+                out var targetObject))
+            {
+                // source was mapped before: returned corresponding target
+                return (TTarget)targetObject;
+            }
+
+            var mappingDelegate = GetValidatedMappingDelegate();
+
             var target = CreateTarget();
+
+            // add mapping before calling the delegate to support cyclic object graphs
+            MappingContext.Current.AddMapping(
+                source,
+                target);
 
             mappingDelegate(
                 source,

@@ -12,7 +12,7 @@ using OffSync.Mapping.Mappert.Tests.Models;
 namespace OffSync.Mapping.Mappert.Tests
 {
     [TestFixture]
-    public class MapperTest
+    public partial class MapperTest
     {
         static readonly IMappingDelegateBuilder[] MappingDelegateBuilders = new IMappingDelegateBuilder[]
         {
