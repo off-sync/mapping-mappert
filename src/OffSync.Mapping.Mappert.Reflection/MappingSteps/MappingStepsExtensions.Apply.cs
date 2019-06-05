@@ -62,11 +62,7 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                     .Select(pi => pi.GetValue(source))
                     .ToArray();
 
-                value = mappingStep
-                    .BuilderInvoke
-                    .Invoke(
-                        mappingStep.Builder,
-                        froms);
+                value = mappingStep.Build(froms);
             }
 
             switch (mappingStep.BuilderType)
@@ -185,11 +181,7 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
             // use builder to get value from source value
             var froms = new object[] { sourceItem };
 
-            return mappingStep
-                .BuilderInvoke
-                .Invoke(
-                    mappingStep.Builder,
-                    froms);
+            return mappingStep.Build(froms);
         }
 
         private static void ApplyFromValueTuple<TTarget>(
