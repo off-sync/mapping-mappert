@@ -1,17 +1,28 @@
-cd 'OffSync.Mapping.Mappert.DynamicMethods.Tests'
-dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='..\out\OffSync.Mapping.Mappert.DynamicMethods.Tests.xml'
-cd ..
+$testProjects = 
+    'OffSync.Mapping.Mappert.Practises.Tests',
+    'OffSync.Mapping.Mappert.Tests',
+    'OffSync.Mapping.Mappert.Reflection.Tests',
+    'OffSync.Mapping.Mappert.DynamicMethods.Tests'
 
-cd 'OffSync.Mapping.Mappert.Practises.Tests'
-dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='..\out\OffSync.Mapping.Mappert.Practises.Tests.xml'
-cd ..
+$frameworks = 
+    'netcoreapp2.2', 
+    'net461', 
+    'net472'
 
-cd 'OffSync.Mapping.Mappert.Reflection.Tests'
-dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='..\out\OffSync.Mapping.Mappert.Reflection.Tests.xml'
-cd ..
+foreach ($testProject in $testProjects)
+{
+    pushd $testProject
 
-cd 'OffSync.Mapping.Mappert.Tests'
-dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='..\out\OffSync.Mapping.Mappert.Tests.xml'
-cd ..
+    foreach ($framework in $frameworks)
+    {
+
+        dotnet test --no-build --framework $framework /p:CollectCoverage=true /p:CoverletOutputFormat=opencover "/p:CoverletOutput=..\out\$($testProject)-$($framework).xml"
+
+    }
+
+    popd
+}
 
 reportgenerator '-reports:out\*.xml' '-targetdir:out\coveragereport'
+
+ii out\coveragereport\index.htm

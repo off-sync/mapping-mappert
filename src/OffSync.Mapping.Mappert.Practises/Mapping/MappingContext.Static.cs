@@ -17,10 +17,6 @@ namespace OffSync.Mapping.Mappert.Practises.Mapping
 
                 return _localMappingContext.Value;
             }
-            set
-            {
-                _localMappingContext.Value = value;
-            }
         }
     }
 }
