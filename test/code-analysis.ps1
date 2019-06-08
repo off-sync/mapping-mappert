@@ -9,20 +9,21 @@ $frameworks =
     'net461', 
     'net472'
 
-foreach ($testProject in $testProjects)
+foreach ($framework in $frameworks)
 {
-    pushd $testProject
-
-    foreach ($framework in $frameworks)
+	foreach ($testProject in $testProjects)
     {
+		pushd $testProject
 
-        dotnet test --no-build --framework $framework /p:CollectCoverage=true /p:CoverletOutputFormat=opencover "/p:CoverletOutput=..\out\$($testProject)-$($framework).xml"
+        dotnet test --no-build --framework $framework /p:CollectCoverage=true /p:CoverletOutputFormat=opencover "/p:CoverletOutput=..\out\$($framework)\$($testProject).xml"
 
+		popd
     }
 
-    popd
+	reportgenerator "-reports:out\$($framework)\*.xml" "-targetdir:out\$($framework)\coveragereport"
 }
 
-reportgenerator '-reports:out\*.xml' '-targetdir:out\coveragereport'
-
-ii out\coveragereport\index.htm
+foreach ($framework in $frameworks)
+{
+	ii out\$framework\coveragereport\index.htm
+}

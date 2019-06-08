@@ -3,6 +3,7 @@
 using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.Practises;
+using OffSync.Mapping.Practises;
 
 namespace OffSync.Mapping.Mappert.Tests
 {
@@ -36,7 +37,6 @@ namespace OffSync.Mapping.Mappert.Tests
 
         [Test]
         [TestCaseSource(nameof(MappingDelegateBuilders))]
-        //[Ignore("until recursive mapping is supported")]
         public void ShouldSupportTrees(
             IMappingDelegateBuilder mappingDelegateBuilder)
         {
@@ -87,7 +87,7 @@ namespace OffSync.Mapping.Mappert.Tests
                     b.WithMappingDelegateBuilder(mappingDelegateBuilder);
                 });
 
-            var target = sut.Map(source);
+            var target = sut.MapRoot(source);
 
             Assert.That(
                 target.SubNodes[0].Parent,
@@ -104,6 +104,18 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.SubNodes[0].SubNodes[0].Parent,
                 Is.SameAs(target.SubNodes[0]));
+
+            source.Id = 10;
+
+            var target2 = sut.MapRoot(source);
+
+            Assert.That(
+                target2,
+                Is.Not.SameAs(target));
+
+            Assert.That(
+                target2.Id,
+                Is.EqualTo(10));
         }
     }
 }
