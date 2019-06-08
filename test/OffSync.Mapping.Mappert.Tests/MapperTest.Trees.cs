@@ -72,6 +72,10 @@ namespace OffSync.Mapping.Mappert.Tests
 
             node1.SubNodes.Add(sub1);
 
+#pragma warning disable S4143 // Collection elements should not be replaced unconditionally
+            node1.SubNodes.Add(sub1);
+#pragma warning restore S4143 // Collection elements should not be replaced unconditionally
+
             var sub2 = new SourceNode()
             {
                 Id = 5,
@@ -104,6 +108,10 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.SubNodes[0].SubNodes[0].Parent,
                 Is.SameAs(target.SubNodes[0]));
+
+            Assert.That(
+                target.SubNodes[0].SubNodes[0],
+                Is.SameAs(target.SubNodes[0].SubNodes[1]));
 
             source.Id = 10;
 
