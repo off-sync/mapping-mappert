@@ -22,6 +22,7 @@ namespace OffSync.Mapping.Mappert.Tests.Common
             IMapper<SourceModel, TargetModelWithoutParameterlessConstructor>
         {
             public TargetModel Map(SourceModel source) => throw new System.NotImplementedException();
+
             TargetModelWithoutParameterlessConstructor IMapper<SourceModel, TargetModelWithoutParameterlessConstructor>.Map(SourceModel source) => throw new System.NotImplementedException();
         }
 

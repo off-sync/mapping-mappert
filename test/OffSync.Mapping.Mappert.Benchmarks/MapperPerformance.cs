@@ -6,8 +6,7 @@ using OffSync.Mapping.Mappert.Reflection;
 
 namespace OffSync.Mapping.Mappert.Benchmarks
 {
-    [CoreJob]
-    //[ClrJob]
+    [CoreJob, ClrJob]
     [RankColumn]
     public class MapperPerformance
     {

@@ -143,6 +143,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
+
         public delegate TTo1 BuilderDelegate(TFrom1 from1);
 
         public MappingRuleBuilderFrom1To1<TFrom1, TTo1> Using(
@@ -164,6 +165,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
+
         public delegate (TTo1, TTo2) BuilderDelegate(TFrom1 from1);
 
         public delegate object[] ArrayBuilderDelegate(TFrom1 from1);
@@ -194,6 +196,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
+
         public delegate (TTo1, TTo2, TTo3) BuilderDelegate(TFrom1 from1);
 
         public delegate object[] ArrayBuilderDelegate(TFrom1 from1);
@@ -268,7 +271,9 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
-        public delegate TTo1 BuilderDelegate(TFrom1 from1, TFrom2 from2);
+
+        public delegate TTo1 BuilderDelegate(TFrom1 from1,
+            TFrom2 from2);
 
         public MappingRuleBuilderFrom2To1<TFrom1, TFrom2, TTo1> Using(
             BuilderDelegate builder)
@@ -289,9 +294,12 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
-        public delegate (TTo1, TTo2) BuilderDelegate(TFrom1 from1, TFrom2 from2);
 
-        public delegate object[] ArrayBuilderDelegate(TFrom1 from1, TFrom2 from2);
+        public delegate (TTo1, TTo2) BuilderDelegate(TFrom1 from1,
+            TFrom2 from2);
+
+        public delegate object[] ArrayBuilderDelegate(TFrom1 from1,
+            TFrom2 from2);
 
         public MappingRuleBuilderFrom2To2<TFrom1, TFrom2, TTo1, TTo2> Using(
             BuilderDelegate builder)
@@ -319,9 +327,12 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
-        public delegate (TTo1, TTo2, TTo3) BuilderDelegate(TFrom1 from1, TFrom2 from2);
 
-        public delegate object[] ArrayBuilderDelegate(TFrom1 from1, TFrom2 from2);
+        public delegate (TTo1, TTo2, TTo3) BuilderDelegate(TFrom1 from1,
+            TFrom2 from2);
+
+        public delegate object[] ArrayBuilderDelegate(TFrom1 from1,
+            TFrom2 from2);
 
         public MappingRuleBuilderFrom2To3<TFrom1, TFrom2, TTo1, TTo2, TTo3> Using(
             BuilderDelegate builder)
@@ -393,7 +404,10 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
-        public delegate TTo1 BuilderDelegate(TFrom1 from1, TFrom2 from2, TFrom3 from3);
+
+        public delegate TTo1 BuilderDelegate(TFrom1 from1,
+            TFrom2 from2,
+            TFrom3 from3);
 
         public MappingRuleBuilderFrom3To1<TFrom1, TFrom2, TFrom3, TTo1> Using(
             BuilderDelegate builder)
@@ -414,9 +428,14 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
-        public delegate (TTo1, TTo2) BuilderDelegate(TFrom1 from1, TFrom2 from2, TFrom3 from3);
 
-        public delegate object[] ArrayBuilderDelegate(TFrom1 from1, TFrom2 from2, TFrom3 from3);
+        public delegate (TTo1, TTo2) BuilderDelegate(TFrom1 from1,
+            TFrom2 from2,
+            TFrom3 from3);
+
+        public delegate object[] ArrayBuilderDelegate(TFrom1 from1,
+            TFrom2 from2,
+            TFrom3 from3);
 
         public MappingRuleBuilderFrom3To2<TFrom1, TFrom2, TFrom3, TTo1, TTo2> Using(
             BuilderDelegate builder)
@@ -444,9 +463,14 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
-        public delegate (TTo1, TTo2, TTo3) BuilderDelegate(TFrom1 from1, TFrom2 from2, TFrom3 from3);
 
-        public delegate object[] ArrayBuilderDelegate(TFrom1 from1, TFrom2 from2, TFrom3 from3);
+        public delegate (TTo1, TTo2, TTo3) BuilderDelegate(TFrom1 from1,
+            TFrom2 from2,
+            TFrom3 from3);
+
+        public delegate object[] ArrayBuilderDelegate(TFrom1 from1,
+            TFrom2 from2,
+            TFrom3 from3);
 
         public MappingRuleBuilderFrom3To3<TFrom1, TFrom2, TFrom3, TTo1, TTo2, TTo3> Using(
             BuilderDelegate builder)

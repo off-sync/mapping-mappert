@@ -24,14 +24,31 @@ namespace OffSync.Mapping.Mappert
         public TTarget Map(
             TSource source)
         {
-            var mappingDelegate = GetValidatedMappingDelegate();
-
             if (source == null)
             {
                 return default(TTarget);
             }
 
+            if (MappingContext.Current != null &&
+                MappingContext.Current.TryGetMapping(
+                  source,
+                  out var targetObject))
+            {
+                // source was mapped before: returned corresponding target
+                return (TTarget)targetObject;
+            }
+
+            var mappingDelegate = GetValidatedMappingDelegate();
+
             var target = CreateTarget();
+
+            if (MappingContext.Current != null)
+            {
+                // add mapping before calling the delegate to support cyclic object graphs
+                MappingContext.Current.AddMapping(
+                source,
+                target);
+            }
 
             mappingDelegate(
                 source,

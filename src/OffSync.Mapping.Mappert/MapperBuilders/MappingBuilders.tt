@@ -146,7 +146,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         for (int j = 0; j < toCount; j++)
         {
             string tos = string.Join(", ", Enumerable.Range(1, j + 1).Select(n => $"TTo{n}"));
-            string fromParameters = string.Join(", ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n} from{n}"));
+            string fromParameters = string.Join(",\r\n            ", Enumerable.Range(1, i + 1).Select(n => $"TFrom{n} from{n}"));
 #>
     [ExcludeFromCodeCoverage]
     public sealed class MappingRuleBuilderFrom<#= i + 1 #>To<#= j + 1 #><<#= froms #>, <#= tos #>> :
@@ -157,6 +157,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
             base(mappingRule)
         {
         }
+
 <#          if (j == 0)
             {#>
         public delegate <#= tos #> BuilderDelegate(<#= fromParameters #>);

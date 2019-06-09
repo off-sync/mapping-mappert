@@ -3,6 +3,7 @@
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
 using OffSync.Mapping.Mappert.Tests.Common;
+using OffSync.Mapping.Mappert.Tests.Models;
 using OffSync.Mapping.Mappert.Validation.Exceptions;
 
 namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
@@ -44,7 +45,7 @@ namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
             });
 
             Assert.That(
-                () => mapper.Map(null),
+                () => mapper.Map(new SourceModel()),
                 Throws.TypeOf<MappingRuleValidationException>());
 
             mapper = new TestMapper(b =>
@@ -59,7 +60,7 @@ namespace OffSync.Mapping.Mappert.Tests.MapperBuilders
             });
 
             Assert.That(
-                () => mapper.Map(null),
+                () => mapper.Map(new SourceModel()),
                 Throws.TypeOf<MappingRuleSetValidationException>());
         }
     }

@@ -10,10 +10,10 @@ using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Reflection.MappingSteps;
 using OffSync.Mapping.Mappert.Tests.Models;
 
-namespace OffSync.Mapping.Mappert.Tests.MappingRules
+namespace OffSync.Mapping.Mappert.Reflection.Tests.MappingRules
 {
     [TestFixture]
-    public class MappingStepsExtensionsTest
+    public partial class MappingStepsExtensionsTest
     {
         [Test]
         public void ApplyFromArray()
