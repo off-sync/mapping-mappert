@@ -53,6 +53,12 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                 value = mappingStep
                     .SourceProperties[0]
                     .GetValue(source);
+
+                if (value == null)
+                {
+                    // ignore this mapping
+                    return;
+                }
             }
             else
             {
@@ -61,6 +67,13 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                     .SourceProperties
                     .Select(pi => pi.GetValue(source))
                     .ToArray();
+
+                if (froms.Length == 1 &&
+                    froms[0] == null)
+                {
+                    // ignore this mapping
+                    return;
+                }
 
                 value = mappingStep.Build(froms);
             }
@@ -105,6 +118,12 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                 .SourceProperties[0]
                 .GetValue(source);
 
+            if (value == null)
+            {
+                // ignore this mapping
+                return;
+            }
+
             // get length of new array
             var length = ItemsUtil.GetItemsCount(value);
 
@@ -140,6 +159,12 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
             var value = mappingStep
                 .SourceProperties[0]
                 .GetValue(source);
+
+            if (value == null)
+            {
+                // ignore this mapping
+                return;
+            }
 
             // create new collection
             var collection = ItemsUtil.CreateCollection(

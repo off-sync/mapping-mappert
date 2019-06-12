@@ -123,6 +123,30 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
             }
         }
 
+        private void AddValueNullCheck(
+            string propertyName,
+            int stackSize,
+            out GroboIL.Label end)
+        {
+            _il.Dup();
+
+            var nonNull = _il.DefineLabel($"{propertyName}IsNotNull");
+
+            _il.Brtrue(nonNull); // set value if value is non-null
+
+            // value is null: pop everything from the stack
+            for (int i = 0; i < stackSize; i++)
+            {
+                _il.Pop();
+            }
+
+            end = _il.DefineLabel($"{propertyName}NullCheckEnd");
+
+            _il.Br(end); // go to end
+
+            _il.MarkLabel(nonNull);
+        }
+
         private void AddDirectAssignment(
             IMappingRule mappingRule)
         {
@@ -132,7 +156,14 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
             _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
+            AddValueNullCheck(
+                mappingRule.SourceProperties[0].Name,
+                stackSize: 2, // value, target
+                out var end);
+
             _il.Call(mappingRule.TargetProperties[0].SetMethod);
+
+            _il.MarkLabel(end);
         }
 
         private void AddApplyToValueBuilderAssignment(
@@ -150,11 +181,28 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                 .Builder
                 .GetType());
 
-            for (int i = 0; i < mappingRule.SourceProperties.Count; i++)
+            GroboIL.Label end = null;
+
+            if (mappingRule.SourceProperties.Count == 1)
             {
+                // only add a null check if there is a single source property
                 _il.Ldarg(SourceArg);
 
-                _il.Call(mappingRule.SourceProperties[i].GetMethod);
+                _il.Call(mappingRule.SourceProperties[0].GetMethod);
+
+                AddValueNullCheck(
+                    mappingRule.SourceProperties[0].Name,
+                    stackSize: 2, // value, builder
+                    out end);
+            }
+            else
+            {
+                for (int i = 0; i < mappingRule.SourceProperties.Count; i++)
+                {
+                    _il.Ldarg(SourceArg);
+
+                    _il.Call(mappingRule.SourceProperties[i].GetMethod);
+                }
             }
 
             var types = mappingRule
@@ -190,6 +238,11 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                     AddObjectArrayAssignment(mappingRule.TargetProperties.ToArray());
 
                     break;
+            }
+
+            if (end != null)
+            {
+                _il.MarkLabel(end);
             }
         }
 
@@ -267,6 +320,11 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
             _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
+            AddValueNullCheck(
+                mappingRule.SourceProperties[0].Name,
+                stackSize: 2, // value, target
+                out var end);
+
             var value = GetSharedTypedLocal(mappingRule.SourceProperties[0].PropertyType);
 
             _il.Stloc(value);
@@ -306,6 +364,8 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
             }
 
             _il.Call(mappingRule.TargetProperties[0].SetMethod);
+
+            _il.MarkLabel(end);
         }
 
         private void AddApplyToCollectionBuilderAssignment(
@@ -369,6 +429,11 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
             _il.Call(mappingRule.SourceProperties[0].GetMethod);
 
+            AddValueNullCheck(
+                mappingRule.SourceProperties[0].Name,
+                stackSize: 3, // value, collection, target
+                out var end);
+
             if (mappingRule.Builder != null)
             {
                 _il.Ldarg(BuildersArg);
@@ -385,6 +450,8 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
             _il.Call(fillMethod);
 
             _il.Call(mappingRule.TargetProperties[0].SetMethod);
+
+            _il.MarkLabel(end);
         }
     }
 }
