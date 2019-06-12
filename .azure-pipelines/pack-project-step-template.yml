@@ -6,4 +6,4 @@ steps:
   displayName: 'Pack ${{ parameters.projectName }}'
   inputs:
     command: pack
-    arguments: '--configuration Release src/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj'
+    arguments: 'src/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj'
