@@ -1,4 +1,9 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Off-Sync.com. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+using BenchmarkDotNet.Attributes;
 
 using OffSync.Mapping.Mappert.DynamicMethods;
 using OffSync.Mapping.Mappert.Practises;

@@ -1,4 +1,9 @@
-﻿using NUnit.Framework;
+﻿/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Off-Sync.com. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
