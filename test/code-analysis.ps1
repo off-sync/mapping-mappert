@@ -6,9 +6,9 @@ $testProjects =
 	'OffSync.Mapping.Mappert.Benchmarks.Tests'
 
 $frameworks = 
-    'netcoreapp2.2'#, 
-#    'net461', 
-#    'net472'
+    'netcoreapp2.2', 
+    'net461', 
+    'net472'
 
 foreach ($framework in $frameworks)
 {
@@ -22,9 +22,6 @@ foreach ($framework in $frameworks)
     }
 
 	reportgenerator "-reports:out\$($framework)\*.xml" "-targetdir:out\$($framework)\coveragereport"
-}
 
-foreach ($framework in $frameworks)
-{
 	ii out\$framework\coveragereport\index.htm
 }

@@ -8,7 +8,7 @@ using System;
 using NUnit.Framework;
 
 using OffSync.Mapping.Mappert.MappingRules;
-using OffSync.Mapping.Mappert.Practises.Common;
+using OffSync.Mapping.Mappert.Practises;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Tests.Models;
 
@@ -22,13 +22,15 @@ namespace OffSync.Mapping.Mappert.Reflection.Tests
         [SetUp]
         public void SetUp()
         {
+            ReflectionMappingDelegateBuilder.SetAsDefault();
+
             _sut = new ReflectionMappingDelegateBuilder();
         }
 
         [Test]
         public void IsRegistered()
         {
-            var builder = ConfigurationUtil.GetRegisteredMappingDelegateBuilder();
+            var builder = MappingDelegateBuilderRegistry.Default;
 
             Assert.That(
                 builder,

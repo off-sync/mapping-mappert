@@ -116,13 +116,6 @@
     <value>invalid builder return type '{0}', must implement matching ValueTuple or object[]</value>
     <comment>Placeholder: return type name.</comment>
   </data>
-  <data name="InvalidTypeMustBeAssignableToIMappingDelegateBuilder" xml:space="preserve">
-    <value>invalid type '{0}': must be assignable to IMappingDelegateBuilder</value>
-    <comment>Placeholder: type name.</comment>
-  </data>
-  <data name="NoMappingDelegateRegistered" xml:space="preserve">
-    <value>no mapping delegate registered</value>
-  </data>
   <data name="MessageMustBeProvided" xml:space="preserve">
     <value>message must be provided</value>
   </data>

@@ -8,18 +8,19 @@ using System.Collections.Generic;
 using System.Linq;
 
 using OffSync.Mapping.Mappert.Practises;
-using OffSync.Mapping.Mappert.Practises.Configuration;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
-using OffSync.Mapping.Mappert.Reflection;
 using OffSync.Mapping.Mappert.Reflection.MappingSteps;
-
-[assembly: RegisterMappingDelegateBuilder(typeof(ReflectionMappingDelegateBuilder))]
 
 namespace OffSync.Mapping.Mappert.Reflection
 {
     public sealed class ReflectionMappingDelegateBuilder :
         IMappingDelegateBuilder
     {
+        public static void SetAsDefault()
+        {
+            MappingDelegateBuilderRegistry.Default = new ReflectionMappingDelegateBuilder();
+        }
+
         public MappingDelegate<TSource, TTarget> CreateMappingDelegate<TSource, TTarget>(
             IEnumerable<IMappingRule> mappingRules)
         {
