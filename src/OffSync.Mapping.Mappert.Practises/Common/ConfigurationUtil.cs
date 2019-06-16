@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using OffSync.Mapping.Mappert.Practises.Configuration;
 
@@ -24,7 +27,27 @@ namespace OffSync.Mapping.Mappert.Practises.Common
 
         public static IMappingDelegateBuilder GetRegisteredMappingDelegateBuilder()
         {
-            var type = AppDomain
+            var type = GetPreferredMappingDelegateBuilder();
+
+            if (type == null)
+            {
+                // try to load assemblies that might not be referenced directly
+                LoadAllAssemblies();
+
+                type = GetPreferredMappingDelegateBuilder();
+            }
+
+            if (type == null)
+            {
+                throw new InvalidOperationException("no mapping delegate registered");
+            }
+
+            return (IMappingDelegateBuilder)Activator.CreateInstance(type);
+        }
+
+        private static Type GetPreferredMappingDelegateBuilder()
+        {
+            return AppDomain
                 .CurrentDomain
                 .GetAssemblies()
                 .SelectMany(a => a.GetCustomAttributes(
@@ -34,13 +57,31 @@ namespace OffSync.Mapping.Mappert.Practises.Common
                 .OrderByDescending(a => a.Preference)
                 .FirstOrDefault()?
                 .BuilderType;
+        }
 
-            if (type == null)
+        private static void LoadAllAssemblies()
+        {
+            var loadedAssemblies = new HashSet<string>(
+                AppDomain
+                    .CurrentDomain
+                    .GetAssemblies()
+                    .Select(a => a.Location));
+
+            var assembliesToLoad = Directory
+                .GetFiles(
+                    AppDomain
+                        .CurrentDomain
+                        .BaseDirectory,
+                    "*.dll")
+                .Where(p => !loadedAssemblies.Contains(p));
+
+            foreach (var path in assembliesToLoad)
             {
-                throw new InvalidOperationException("no mapping delegate registered");
+                // load into execution context
+                AppDomain
+                    .CurrentDomain
+                    .Load(AssemblyName.GetAssemblyName(path));
             }
-
-            return (IMappingDelegateBuilder)Activator.CreateInstance(type);
         }
     }
 }
