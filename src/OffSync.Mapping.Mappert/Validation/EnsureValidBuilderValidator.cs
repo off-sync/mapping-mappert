@@ -1,4 +1,9 @@
-﻿using OffSync.Mapping.Mappert.Common;
+﻿/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Off-Sync.com. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+using OffSync.Mapping.Mappert.Common;
 using OffSync.Mapping.Mappert.Practises.Builders;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;

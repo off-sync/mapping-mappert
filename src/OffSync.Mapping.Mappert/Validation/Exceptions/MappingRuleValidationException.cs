@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Off-Sync.com. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+using System;
 using System.Runtime.Serialization;
 
 using OffSync.Mapping.Mappert.MappingRules;
