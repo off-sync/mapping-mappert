@@ -65,6 +65,7 @@ namespace OffSync.Mapping.Mappert.Practises.Common
                 AppDomain
                     .CurrentDomain
                     .GetAssemblies()
+                    .Where(a => !a.IsDynamic)
                     .Select(a => a.Location));
 
             var assembliesToLoad = Directory
