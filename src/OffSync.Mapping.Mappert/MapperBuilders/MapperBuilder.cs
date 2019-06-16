@@ -89,7 +89,12 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
         {
             if (_mappingDelegateBuilder == null)
             {
-                _mappingDelegateBuilder = new ReflectionMappingDelegateBuilder();
+                if (MappingDelegateBuilderRegistry.Default == null)
+                {
+                    MappingDelegateBuilderRegistry.Default = new ReflectionMappingDelegateBuilder();
+                }
+
+                _mappingDelegateBuilder = MappingDelegateBuilderRegistry.Default;
             }
 
             return _mappingDelegateBuilder.CreateMappingDelegate<TSource, TTarget>(mappingRules);

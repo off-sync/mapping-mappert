@@ -16,6 +16,11 @@ namespace OffSync.Mapping.Mappert.Reflection
     public sealed class ReflectionMappingDelegateBuilder :
         IMappingDelegateBuilder
     {
+        public static void SetAsDefault()
+        {
+            MappingDelegateBuilderRegistry.Default = new ReflectionMappingDelegateBuilder();
+        }
+
         public MappingDelegate<TSource, TTarget> CreateMappingDelegate<TSource, TTarget>(
             IEnumerable<IMappingRule> mappingRules)
         {

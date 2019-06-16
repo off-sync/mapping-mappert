@@ -17,6 +17,11 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
     public class DynamicMethodMappingDelegateBuilder :
         IMappingDelegateBuilder
     {
+        public static void SetAsDefault()
+        {
+            MappingDelegateBuilderRegistry.Default = new DynamicMethodMappingDelegateBuilder();
+        }
+
         public MappingDelegate<TSource, TTarget> CreateMappingDelegate<TSource, TTarget>(
             IEnumerable<IMappingRule> mappingRules)
         {
