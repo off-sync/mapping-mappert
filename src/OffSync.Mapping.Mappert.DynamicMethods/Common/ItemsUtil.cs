@@ -27,7 +27,9 @@ namespace OffSync.Mapping.Mappert.DynamicMethods.Common
             }
 
             throw new ArgumentException(
-                $"value has unsupported items type: '{type.FullName}'",
+                string.Format(
+                    Messages.ValueHasUnsupportedItemsType,
+                    type.FullName),
                 nameof(value));
         }
 

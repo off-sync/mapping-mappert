@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using OffSync.Mapping.Mappert.Common;
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises;
 using OffSync.Mapping.Mappert.Practises.Common;
@@ -45,7 +46,7 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
                 () =>
                 {
                     throw new InvalidOperationException(
-                        $"{nameof(AddMappingRule)} only allowed before rules have been checked");
+                        Messages.AddMappingRuleOnlyAllowedBeforeRulesHaveBeenChecked);
                 },
                 () =>
                 {

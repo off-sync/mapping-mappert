@@ -28,7 +28,9 @@ namespace OffSync.Mapping.Mappert.Validation
                         .Select(pi => pi.Name));
 
                 return Invalid(
-                    $"exactly one source property must be mapped for an items mapping, found: '{sourceNames}'");
+                    string.Format(
+                        Messages.ExactlyOneSourcePropertyMustBeMappedForItemsMapping,
+                        sourceNames));
             }
 
             if (mappingRule.TargetProperties.Count != 1)
@@ -40,7 +42,9 @@ namespace OffSync.Mapping.Mappert.Validation
                         .Select(pi => pi.Name));
 
                 return Invalid(
-                    $"exactly one target property must be mapped for an items mapping, found: '{targetNames}'");
+                    string.Format(
+                        Messages.ExactlyOneTargetPropertyMustBeMappedForItemsMappingFound,
+                        targetNames));
             }
 
             if (!ItemsUtil.TryGetSourceItemsType(
@@ -48,7 +52,9 @@ namespace OffSync.Mapping.Mappert.Validation
                 out var sourceItemsType))
             {
                 return Invalid(
-                    $"unable to determine source items type for property: '{mappingRule.SourceProperties[0].Name}'");
+                    string.Format(
+                        Messages.UnableToDetermineSourceItemsType,
+                        mappingRule.SourceProperties[0].Name));
             }
 
             if (!ItemsUtil.TryGetTargetItemsType(
@@ -56,7 +62,9 @@ namespace OffSync.Mapping.Mappert.Validation
                 out var targetItemsType))
             {
                 return Invalid(
-                    $"unable to determine target items type for property: '{mappingRule.TargetProperties[0].Name}'");
+                    string.Format(
+                        Messages.UnableToDetermineTargetItemsType,
+                        mappingRule.TargetProperties[0].Name));
             }
 
             return Valid();

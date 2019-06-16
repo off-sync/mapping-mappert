@@ -137,7 +137,10 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
             _il.Dup();
 
-            var nonNull = _il.DefineLabel($"{property.Name}IsNotNull");
+            var nonNull = _il.DefineLabel(
+                string.Format(
+                    Constants.PropertyNameIsNotNull,
+                    property.Name));
 
             _il.Brtrue(nonNull); // set value if value is non-null
 
@@ -147,7 +150,10 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                 _il.Pop();
             }
 
-            var end = _il.DefineLabel($"{property.Name}NullCheckEnd");
+            var end = _il.DefineLabel(
+                string.Format(
+                    Constants.PropertyNameNullCheckEnd,
+                    property.Name));
 
             _il.Br(end); // go to end
 
@@ -228,7 +234,7 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                     .Builder
                     .GetType()
                     .GetMethod(
-                        "Invoke",
+                        Constants.InvokeMethodName,
                         types));
 
             switch (builderType)
@@ -285,7 +291,11 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
 
                 _il.Ldloca(value); // load by ref required for GetField on ValueTuple
 
-                _il.Ldfld(returnType.GetField($"Item{i + 1}"));
+                _il.Ldfld(
+                    returnType.GetField(
+                        string.Format(
+                            Constants.ItemFieldName,
+                            i + 1)));
 
                 _il.Call(targetProperties[i].SetMethod);
             }

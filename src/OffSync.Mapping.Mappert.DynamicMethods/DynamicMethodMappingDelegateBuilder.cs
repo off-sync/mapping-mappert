@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Emit;
 
 using OffSync.Mapping.Mappert.DynamicMethods;
+using OffSync.Mapping.Mappert.DynamicMethods.Common;
 using OffSync.Mapping.Mappert.Practises;
 using OffSync.Mapping.Mappert.Practises.Configuration;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
@@ -32,15 +33,23 @@ namespace OffSync.Mapping.Mappert.DynamicMethods
                 r.TargetProperties.Count != 1)))
             {
                 throw new ArgumentException(
-                    $"a builder must be present for every multi property mapping rule",
+                    Messages.BuilderMustBePresentForEveryMultiPropertyMappingRule,
                     nameof(mappingRules));
             }
             #endregion
 
             var mapMethod = new DynamicMethod(
-                $"Map{typeof(TSource).Name}To{typeof(TTarget).Name}",
-                null,
-                new Type[] { typeof(TSource), typeof(TTarget), typeof(Delegate[]) });
+                name: string.Format(
+                    Constants.DynamicMapMethodName,
+                    typeof(TSource).Name,
+                    typeof(TTarget).Name),
+                returnType: null, // void
+                parameterTypes: new Type[]
+                {
+                    typeof(TSource),
+                    typeof(TTarget),
+                    typeof(Delegate[])
+                });
 
             var builders = new List<Delegate>();
 

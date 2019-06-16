@@ -20,7 +20,7 @@ namespace OffSync.Mapping.Mappert.Common
             if (memberExpression == null)
             {
                 throw new ArgumentException(
-                    $"expression body must by of type {nameof(MemberExpression)}",
+                    Messages.ExpressionBodyMustByOfTypeMemberExpression,
                     nameof(expression));
             }
 
@@ -29,7 +29,7 @@ namespace OffSync.Mapping.Mappert.Common
             if (propertyInfo == null)
             {
                 throw new ArgumentException(
-                    $"expression body must access a property",
+                    Messages.ExpressionBodyMustAccessProperty,
                     nameof(expression));
             }
             #endregion

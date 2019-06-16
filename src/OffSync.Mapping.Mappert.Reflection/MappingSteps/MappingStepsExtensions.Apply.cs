@@ -174,7 +174,7 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
             var addMethod = collection
                 .GetType()
                 .GetMethod(
-                    "Add",
+                    Constants.AddMethodName,
                     new Type[] { mappingStep.TargetItemType });
 
             // loop source values and add to collection
@@ -236,7 +236,10 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
             if (mappingStep.TargetProperties.Length != value.Length)
             {
                 throw new InvalidOperationException(
-                    $"invalid number of objects in value '{value.Length}', expected '{mappingStep.TargetProperties.Length}'");
+                    string.Format(
+                        Messages.InvalidNumberOfObjectsInValue,
+                        value.Length,
+                        mappingStep.TargetProperties.Length));
             }
 
             for (int i = 0; i < mappingStep.TargetProperties.Length; i++)

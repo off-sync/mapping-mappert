@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using OffSync.Mapping.Mappert.Common;
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
 
@@ -30,7 +31,9 @@ namespace OffSync.Mapping.Mappert.Validation
                         .Select(pi => pi.Name));
 
                 return Invalid(
-                    $"no mapping found for target properties: '{names}'");
+                    string.Format(
+                        Messages.NoMappingFoundForTargetProperties,
+                        names));
             }
 
             return Valid();

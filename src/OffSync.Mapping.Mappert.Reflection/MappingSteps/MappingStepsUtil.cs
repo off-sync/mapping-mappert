@@ -3,6 +3,7 @@ using System.Reflection;
 
 using OffSync.Mapping.Mappert.Practises.Builders;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
+using OffSync.Mapping.Mappert.Reflection.Common;
 
 namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
 {
@@ -25,7 +26,10 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
 
                 valueTupleFields = Enumerable
                     .Range(1, mappingRule.TargetProperties.Count)
-                    .Select(i => returnType.GetField($"Item{i}"))
+                    .Select(i => returnType.GetField(
+                        string.Format(
+                            Constants.ItemFieldName,
+                            i)))
                     .ToArray();
             }
 
@@ -44,7 +48,7 @@ namespace OffSync.Mapping.Mappert.Reflection.MappingSteps
                     .Builder
                     .GetType()
                     .GetMethod(
-                        "Invoke",
+                        Constants.InvokeMethodName,
                         paramTypes);
             }
 

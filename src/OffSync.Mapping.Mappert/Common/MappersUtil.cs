@@ -51,7 +51,9 @@ namespace OffSync.Mapping.Mappert.Common
             if (targetType.GetConstructor(Type.EmptyTypes) == null)
             {
                 throw new ArgumentException(
-                    $"cannot create auto-mapper: target type '{targetType.Name}' does not have a parameterless constructor",
+                    string.Format(
+                        Messages.CannotCreateAutoMapperTargetTypeDoesNotHaveParameterlessConstructor,
+                        targetType.Name),
                     nameof(targetType));
             }
             #endregion
@@ -81,14 +83,14 @@ namespace OffSync.Mapping.Mappert.Common
             if (!mapperTypes.Any())
             {
                 throw new ArgumentException(
-                    $"invalid type: must implement IMapper<,>",
+                    Messages.InvalidTypeMustImplementIMapper,
                     nameof(mapper));
             }
 
             if (mapperTypes.Skip(1).Any())
             {
                 throw new ArgumentException(
-                    $"invalid type: must implement IMapper<,> exactly once",
+                    Messages.InvalidTypeMustImplementIMapperExactlyOnce,
                     nameof(mapper));
             }
 
@@ -101,7 +103,7 @@ namespace OffSync.Mapping.Mappert.Common
 
             var mapMethod = mapperType
                 .GetMethod(
-                    "Map",
+                    Constants.MapMethodName,
                     new Type[] { sourceType });
 
             var builderType = typeof(Func<,>)

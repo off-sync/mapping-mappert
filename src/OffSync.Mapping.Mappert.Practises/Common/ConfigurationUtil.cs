@@ -21,7 +21,9 @@ namespace OffSync.Mapping.Mappert.Practises.Common
             if (!typeof(IMappingDelegateBuilder).IsAssignableFrom(type))
             {
                 throw new ArgumentException(
-                    $"invalid type '{type.FullName}': must be assignable to {nameof(IMappingDelegateBuilder)}");
+                    string.Format(
+                        Messages.InvalidTypeMustBeAssignableToIMappingDelegateBuilder,
+                        type.FullName));
             }
         }
 
@@ -39,7 +41,8 @@ namespace OffSync.Mapping.Mappert.Practises.Common
 
             if (type == null)
             {
-                throw new InvalidOperationException("no mapping delegate registered");
+                throw new InvalidOperationException(
+                    Messages.NoMappingDelegateRegistered);
             }
 
             return (IMappingDelegateBuilder)Activator.CreateInstance(type);

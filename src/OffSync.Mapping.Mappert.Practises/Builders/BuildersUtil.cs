@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 
+using OffSync.Mapping.Mappert.Practises.Common;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 
 namespace OffSync.Mapping.Mappert.Practises.Builders
@@ -42,7 +43,7 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
             if (mappingRule.TargetProperties.Count == 0)
             {
                 throw new ArgumentException(
-                    $"{nameof(mappingRule.TargetProperties)} must contain at least one element",
+                    Messages.TargetPropertiesMustContainAtLeastOneElement,
                     nameof(mappingRule));
             }
             #endregion
@@ -77,7 +78,10 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
             if (paramTypes.Length != sourceTypes.Length)
             {
                 throw new ArgumentException(
-                    $"invalid number of builder parameters '{paramTypes.Length}', expected '{sourceTypes.Length}'");
+                    string.Format(
+                        Messages.InvalidNumberOfBuilderParameters,
+                        paramTypes.Length,
+                        sourceTypes.Length));
             }
 
             for (int i = 0; i < sourceTypes.Length; i++)
@@ -85,7 +89,11 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
                 if (!paramTypes[i].ParameterType.IsAssignableFrom(sourceTypes[i]))
                 {
                     throw new ArgumentException(
-                        $"invalid builder parameter at index '{i}': '{paramTypes[i].ParameterType.FullName}' must be assignable from '{sourceTypes[i].FullName}'");
+                        string.Format(
+                            Messages.InvalidBuilderParameterMustBeAssignable,
+                            i,
+                            paramTypes[i].ParameterType.FullName,
+                            sourceTypes[i].FullName));
                 }
             }
 
@@ -99,20 +107,19 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
                 if (!targetTypes[0].IsAssignableFrom(returnType))
                 {
                     throw new ArgumentException(
-                        $"invalid builder return type: '{targetTypes[0].FullName}' must be assignable from '{returnType.FullName}'");
+                        string.Format(
+                            Messages.InvalidBuilderReturnTypeMustBeAssignable,
+                            targetTypes[0].FullName,
+                            returnType.FullName));
                 }
 
                 return BuilderTypes.SingleValue;
             }
 
             // check if return type implements matching value tuple
-            var valueTupleTypeName =
-#if NET461
-                // value tuple is defined in a separate assembly
-                $"System.ValueTuple`{targetTypes.Length},System.ValueTuple";
-#else
-                $"System.ValueTuple`{targetTypes.Length}";
-#endif
+            var valueTupleTypeName = string.Format(
+                Constants.ValueTupleTypeName,
+                targetTypes.Length);
 
             var valueTupleType = Type
                 .GetType(valueTupleTypeName)
@@ -130,7 +137,9 @@ namespace OffSync.Mapping.Mappert.Practises.Builders
             }
 
             throw new ArgumentException(
-                $"invalid builder return type '{returnType.FullName}', must implement matching ValueTuple or object[]");
+                string.Format(
+                    Messages.InvalidBuilderReturnTypeMustImplementValueTupleOrObjectArray,
+                    returnType.FullName));
         }
     }
 }

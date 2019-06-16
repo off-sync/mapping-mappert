@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OffSync.Mapping.Mappert.Practises.Common;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 
 namespace OffSync.Mapping.Mappert.Practises.Validation
@@ -26,7 +27,7 @@ namespace OffSync.Mapping.Mappert.Practises.Validation
             if (string.IsNullOrWhiteSpace(message))
             {
                 throw new ArgumentException(
-                    "message must be provided",
+                    Messages.MessageMustBeProvided,
                     nameof(message));
             }
             #endregion

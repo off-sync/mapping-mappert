@@ -22,13 +22,13 @@ namespace OffSync.Mapping.Mappert.Validation
                 mappingRule.TargetProperties.Count > 1)
             {
                 return Invalid(
-                    $"auto-mapper not possible for multi-property mapping rule");
+                    Messages.AutoMapperNotPossibleForMultiPropertyMappingRule);
             }
 
             if (mappingRule.SourceProperties.Count == 0)
             {
                 return Invalid(
-                    $"auto-mapper not possible for target properties only mapping rule");
+                    Messages.AutoMapperNotPossibleForTargetPropertiesOnlyMappingRule);
             }
 
             var sourceType = mappingRule.SourceItemsType ?? mappingRule.SourceProperties[0].PropertyType;
@@ -48,7 +48,7 @@ namespace OffSync.Mapping.Mappert.Validation
                 out var exception))
             {
                 return Invalid(
-                    $"unable to create auto-mapper",
+                    Messages.UnableToCreateAutoMapper,
                     exception);
             }
 

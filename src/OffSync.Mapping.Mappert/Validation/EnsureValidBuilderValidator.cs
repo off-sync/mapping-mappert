@@ -1,4 +1,5 @@
-﻿using OffSync.Mapping.Mappert.Practises.Builders;
+﻿using OffSync.Mapping.Mappert.Common;
+using OffSync.Mapping.Mappert.Practises.Builders;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
 
@@ -16,13 +17,13 @@ namespace OffSync.Mapping.Mappert.Validation
                     mappingRule.TargetProperties.Count > 1)
                 {
                     return Invalid(
-                        "builder required for multi-property mapping rule");
+                        Messages.BuilderRequiredForMultiPropertyMappingRule);
                 }
 
                 if (mappingRule.SourceProperties.Count == 0)
                 {
                     return Invalid(
-                        "builder required for target-properties only mapping rule");
+                        Messages.BuilderRequiredForTargetPropertiesOnlyMappingRule);
                 }
 
                 return Valid();
@@ -34,7 +35,9 @@ namespace OffSync.Mapping.Mappert.Validation
                 out var exception))
             {
                 return Invalid(
-                    $"invalid builder type: {mappingRule.Builder.GetType()}",
+                    string.Format(
+                        Messages.InvalidBuilderType,
+                        mappingRule.Builder.GetType()),
                     exception);
             }
 

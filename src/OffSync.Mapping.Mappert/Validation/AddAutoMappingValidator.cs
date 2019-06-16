@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using OffSync.Mapping.Mappert.Common;
 using OffSync.Mapping.Mappert.MappingRules;
 using OffSync.Mapping.Mappert.Practises.Validation;
 
@@ -34,7 +35,9 @@ namespace OffSync.Mapping.Mappert.Validation
                     out var exception))
                 {
                     return Invalid(
-                        $"unable to create auto-mapping for property '{targetProperty.Name}'",
+                        string.Format(
+                            Messages.UnableToCreateAutoMappingForProperty,
+                            targetProperty.Name),
                         exception);
                 }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using OffSync.Mapping.Mappert.Practises.Common;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
 
 namespace OffSync.Mapping.Mappert.Practises.Validation
@@ -29,7 +30,7 @@ namespace OffSync.Mapping.Mappert.Practises.Validation
             if (string.IsNullOrWhiteSpace(message))
             {
                 throw new ArgumentException(
-                    "message must be provided",
+                    Messages.MessageMustBeProvided,
                     nameof(message));
             }
             #endregion
@@ -53,7 +54,7 @@ namespace OffSync.Mapping.Mappert.Practises.Validation
                 !rulesToRemove.Any()))
             {
                 throw new ArgumentException(
-                    $"either {nameof(rulesToAdd)} or {nameof(rulesToRemove)} must be non-null and contain elements");
+                    Messages.EitherRulesToAddOrRulesToRemoveMustBeNonNullAndContainElements);
             }
             #endregion
 
