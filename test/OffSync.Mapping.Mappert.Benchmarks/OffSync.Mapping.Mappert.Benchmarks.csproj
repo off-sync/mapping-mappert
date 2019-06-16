@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp2.2;net461;net472</TargetFrameworks>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.2|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert.DynamicMethods\OffSync.Mapping.Mappert.DynamicMethods.csproj" />
+    <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert.Reflection\OffSync.Mapping.Mappert.Reflection.csproj" />
+    <ProjectReference Include="..\..\src\OffSync.Mapping.Mappert\OffSync.Mapping.Mappert.csproj" />
+  </ItemGroup>
+
+</Project>

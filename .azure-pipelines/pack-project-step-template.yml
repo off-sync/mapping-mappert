@@ -1,0 +1,9 @@
+parameters:
+  projectName: ''
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Pack ${{ parameters.projectName }}'
+  inputs:
+    command: pack
+    arguments: 'src/${{ parameters.projectName }}/${{ parameters.projectName }}.csproj'

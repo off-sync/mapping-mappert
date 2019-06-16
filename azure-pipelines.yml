@@ -1,0 +1,122 @@
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+- job: TestWindows
+  pool:
+    vmImage: 'windows-2019'
+  variables:
+    BuildConfiguration: Release
+  strategy:
+    matrix:
+      NetCoreApp2_2:
+        framework: netcoreapp2.2
+      Net461:
+        framework: net461
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: build
+      arguments: '--configuration $(BuildConfiguration)'
+
+  - template: .azure-pipelines/test-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.Tests
+
+  - template: .azure-pipelines/test-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.DynamicMethods.Tests
+
+  - template: .azure-pipelines/test-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.Practises.Tests
+
+  - template: .azure-pipelines/test-project-step-template.yml
+    parameters:
+      framework: $(framework)
+      projectName: OffSync.Mapping.Mappert.Reflection.Tests
+
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/TestResults/*.trx'
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'TestWindows-TestResults-$(framework)'
+      targetPath: '$(Build.ArtifactStagingDirectory)/TestResults'
+
+- job: Quality
+  dependsOn: [ TestWindows ]
+  pool:
+    vmImage: 'windows-2019'
+  variables:
+    BuildConfiguration: Release
+  steps:
+  - task: DownloadPipelineArtifact@1
+    inputs:
+      downloadPath: '$(Agent.TempDirectory)/TestResults'
+
+  - task: SonarCloudPrepare@1
+    displayName: 'Prepare Code Analysis'
+    inputs:
+      SonarCloud: 'SonarCloud'
+      organization: 'off-sync'
+      projectKey: 'off-sync_mapping-mappert'
+      projectName: 'Off-Sync.com Mappert'
+      extraProperties: |
+        sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.opencover.xml
+        sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/TestResults/**/*.trx
+        sonar.coverage.exclusions=test/OffSync.Mapping.Mappert.Benchmarks/**/*
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Solution'
+    inputs:
+      command: build
+      arguments: '--configuration $(BuildConfiguration)'
+  
+  - task: SonarCloudAnalyze@1
+    displayName: 'Run Code Analysis'
+
+  - task: SonarCloudPublish@1
+    displayName: 'Publish Code Analysis'
+
+  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+    displayName: ReportGenerator
+    inputs:     
+      reports: '$(Agent.TempDirectory)/TestResults/**/*.opencover.xml'
+      targetdir: '$(Agent.TempDirectory)/Reports'
+      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+      assemblyfilters: '-nunit*'
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      summaryFileLocation: '$(Agent.TempDirectory)/Reports/Cobertura.xml'
+      codecoverageTool: cobertura
+
+- job: Pack
+  dependsOn: [ Quality ]
+  pool:
+    vmImage: 'windows-2019'
+  variables:
+    BuildConfiguration: Release
+  steps:
+  - template: .azure-pipelines/pack-project-step-template.yml
+    parameters:
+      projectName: OffSync.Mapping.Mappert
+
+  - template: .azure-pipelines/pack-project-step-template.yml
+    parameters:
+      projectName: OffSync.Mapping.Mappert.DynamicMethods
+
+  - template: .azure-pipelines/pack-project-step-template.yml
+    parameters:
+      projectName: OffSync.Mapping.Mappert.Practises
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Build Artifacts'

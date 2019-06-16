@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Metadata">
+    <Description>Off-Sync.com Mappert - Fast and flexible object mapping for C#.</Description>
+    <PackageTags>mapper;mapping;mappert;reflection</PackageTags>
+    <Title>Off-Sync.com Mapping Mappert</Title>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OffSync.Mapping.Practises" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OffSync.Mapping.Mappert.Practises\OffSync.Mapping.Mappert.Practises.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MapperBuilders\MappingBuilders.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MappingBuilders.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Common\Messages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="MapperBuilders\MappingBuilders.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MappingBuilders.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Common\Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

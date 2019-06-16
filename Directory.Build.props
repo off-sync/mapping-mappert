@@ -1,0 +1,20 @@
+<Project>
+
+  <PropertyGroup Label="Metadata">
+    <Authors>basverweij</Authors>
+    <Company>Off-Sync.com</Company>
+    <Copyright>Copyright (c) Off-Sync.com</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/off-sync/mapping-mappert</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Version">
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+</Project>
