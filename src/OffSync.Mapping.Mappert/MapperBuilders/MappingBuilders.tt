@@ -13,9 +13,9 @@ using OffSync.Mapping.Mappert.MappingRules;
 namespace OffSync.Mapping.Mappert.MapperBuilders
 {
 <#
-    const int fromCount = 3;
+    const int fromCount = 7;
 
-    const int toCount = 3;
+    const int toCount = 7;
 #>
     public partial interface IMapperBuilder<TSource, TTarget>
     {
@@ -160,14 +160,17 @@ namespace OffSync.Mapping.Mappert.MapperBuilders
 
 <#          if (j == 0)
             {#>
-        public delegate <#= tos #> BuilderDelegate(<#= fromParameters #>);
+        public delegate <#= tos #> BuilderDelegate(
+            <#= fromParameters #>);
 <#
             }
             else
             {#>
-        public delegate (<#= tos #>) BuilderDelegate(<#= fromParameters #>);
+        public delegate (<#= tos #>) BuilderDelegate(
+            <#= fromParameters #>);
 
-        public delegate object[] ArrayBuilderDelegate(<#= fromParameters #>);
+        public delegate object[] ArrayBuilderDelegate(
+            <#= fromParameters #>);
 <#
             }
 #>
