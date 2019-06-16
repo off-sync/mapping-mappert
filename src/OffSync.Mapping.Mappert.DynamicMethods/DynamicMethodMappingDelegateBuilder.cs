@@ -8,15 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 
-using OffSync.Mapping.Mappert.DynamicMethods;
 using OffSync.Mapping.Mappert.DynamicMethods.Common;
 using OffSync.Mapping.Mappert.Practises;
-using OffSync.Mapping.Mappert.Practises.Configuration;
 using OffSync.Mapping.Mappert.Practises.MappingRules;
-
-[assembly: RegisterMappingDelegateBuilder(
-    typeof(DynamicMethodMappingDelegateBuilder),
-    Preference = 100)]
 
 namespace OffSync.Mapping.Mappert.DynamicMethods
 {

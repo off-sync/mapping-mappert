@@ -106,29 +106,11 @@ namespace OffSync.Mapping.Mappert.Practises.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to invalid type &apos;{0}&apos;: must be assignable to IMappingDelegateBuilder.
-        /// </summary>
-        internal static string InvalidTypeMustBeAssignableToIMappingDelegateBuilder {
-            get {
-                return ResourceManager.GetString("InvalidTypeMustBeAssignableToIMappingDelegateBuilder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to message must be provided.
         /// </summary>
         internal static string MessageMustBeProvided {
             get {
                 return ResourceManager.GetString("MessageMustBeProvided", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to no mapping delegate registered.
-        /// </summary>
-        internal static string NoMappingDelegateRegistered {
-            get {
-                return ResourceManager.GetString("NoMappingDelegateRegistered", resourceCulture);
             }
         }
         
