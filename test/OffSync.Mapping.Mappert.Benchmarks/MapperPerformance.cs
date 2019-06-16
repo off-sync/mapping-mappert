@@ -3,6 +3,7 @@
 using OffSync.Mapping.Mappert.DynamicMethods;
 using OffSync.Mapping.Mappert.Practises;
 using OffSync.Mapping.Mappert.Reflection;
+using OffSync.Mapping.Practises;
 
 namespace OffSync.Mapping.Mappert.Benchmarks
 {
@@ -31,6 +32,10 @@ namespace OffSync.Mapping.Mappert.Benchmarks
         private Mapper<TupleSplitterSourceModel, TupleSplitterTargetModel> _tupleSplitterMapper;
 
         private readonly TupleSplitterSourceModel _tupleSplitterSource = new TupleSplitterSourceModel();
+
+        private Mapper<CyclicSourceModel, CyclicTargetModel> _cyclicMapper;
+
+        private readonly CyclicSourceModel _cyclicSource = CyclicSourceModel.Create();
 
         private readonly IMappingDelegateBuilder[] _mappingDelegateBuilders = new IMappingDelegateBuilder[]
         {
@@ -61,6 +66,10 @@ namespace OffSync.Mapping.Mappert.Benchmarks
             _tupleSplitterMapper = new TupleSplitterMapper(mappingDelegateBuilder);
 
             _tupleSplitterMapper.Map(_tupleSplitterSource);
+
+            _cyclicMapper = new CyclicMapper(mappingDelegateBuilder);
+
+            _cyclicMapper.MapRoot(_cyclicSource);
         }
 
         [Benchmark(Baseline = true)]
@@ -74,5 +83,8 @@ namespace OffSync.Mapping.Mappert.Benchmarks
 
         [Benchmark]
         public TupleSplitterTargetModel MapTupleSplitter() => _tupleSplitterMapper.Map(_tupleSplitterSource);
+
+        [Benchmark]
+        public CyclicTargetModel MapCyclic() => _cyclicMapper.MapRoot(_cyclicSource);
     }
 }

@@ -2,12 +2,13 @@ $testProjects =
     'OffSync.Mapping.Mappert.Practises.Tests',
     'OffSync.Mapping.Mappert.Tests',
     'OffSync.Mapping.Mappert.Reflection.Tests',
-    'OffSync.Mapping.Mappert.DynamicMethods.Tests'
+    'OffSync.Mapping.Mappert.DynamicMethods.Tests',
+	'OffSync.Mapping.Mappert.Benchmarks.Tests'
 
 $frameworks = 
-    'netcoreapp2.2', 
-    'net461', 
-    'net472'
+    'netcoreapp2.2'#, 
+#    'net461', 
+#    'net472'
 
 foreach ($framework in $frameworks)
 {

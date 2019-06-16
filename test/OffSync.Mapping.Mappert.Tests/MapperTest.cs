@@ -36,7 +36,7 @@ namespace OffSync.Mapping.Mappert.Tests
                     Key = 3,
                     Value = "4",
                 },
-                Values = "5,6",
+                Values = "5,6,20",
                 LookupValue = "7",
                 ItemsEnumerable = new List<SourceNested>()
                 {
@@ -111,6 +111,22 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.Value2,
                 Is.EqualTo("6"));
+
+            Assert.That(
+                target.Value3,
+                Is.EqualTo("20"));
+
+            Assert.That(
+                target.MoreValue1,
+                Is.EqualTo("5"));
+
+            Assert.That(
+                target.MoreValue2,
+                Is.EqualTo("6"));
+
+            Assert.That(
+                target.MoreValue3,
+                Is.EqualTo("20"));
 
             Assert.That(
                 target.LookupId,
@@ -231,6 +247,14 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target.NestedToo.Value,
                 Is.EqualTo("4"));
+
+            Assert.That(
+                target.IdAndName,
+                Is.EqualTo("#1 (2)"));
+
+            Assert.That(
+                target.Generated,
+                Is.EqualTo("generated"));
         }
 
         [Test]
@@ -245,6 +269,22 @@ namespace OffSync.Mapping.Mappert.Tests
             Assert.That(
                 target,
                 Is.Null);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(MappingDelegateBuilders))]
+        public void MapperShouldIgnoreMappingIfSingleSourcePropertyIsNull(
+            IMappingDelegateBuilder mappingDelegateBuilder)
+        {
+            var sut = new TestMapper(mappingDelegateBuilder);
+
+            var source = new SourceModel();
+
+            var target = sut.Map(source);
+
+            Assert.That(
+                target,
+                Is.Not.Null);
         }
 
         [Test]

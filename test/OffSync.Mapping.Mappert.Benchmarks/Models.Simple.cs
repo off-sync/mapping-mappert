@@ -1,4 +1,7 @@
-﻿using OffSync.Mapping.Mappert.Practises;
+﻿
+using System;
+
+using OffSync.Mapping.Mappert.Practises;
 
 namespace OffSync.Mapping.Mappert.Benchmarks
 {
@@ -8,7 +11,18 @@ namespace OffSync.Mapping.Mappert.Benchmarks
 
         public string Name { get; set; } = "2";
 
-        public bool Ignored { get; set; }
+        public DateTimeOffset CreatedOn { get; set; } = new DateTimeOffset(2003, 4, 5, 6, 7, 8, TimeSpan.FromHours(9));
+
+        public SimpleSourceNested Nested { get; set; } = new SimpleSourceNested() { Key = 10, Value = "11" };
+
+        public int? Nullable { get; set; } = 12;
+    }
+
+    public class SimpleSourceNested
+    {
+        public int Key { get; set; }
+
+        public string Value { get; set; }
     }
 
     public class SimpleTargetModel
@@ -17,7 +31,18 @@ namespace OffSync.Mapping.Mappert.Benchmarks
 
         public string Description { get; set; }
 
-        public bool Excluded { get; set; }
+        public DateTime CreatedOn { get; set; }
+
+        public SimpleTargetNested Nested { get; set; }
+
+        public int? Nullable { get; set; }
+    }
+
+    public class SimpleTargetNested
+    {
+        public int Key { get; set; }
+
+        public string Value { get; set; }
     }
 
     public class SimpleMapper :
@@ -31,9 +56,9 @@ namespace OffSync.Mapping.Mappert.Benchmarks
             Map(s => s.Name)
                 .To(t => t.Description);
 
-            IgnoreSource(s => s.Ignored);
-
-            IgnoreTarget(t => t.Excluded);
+            Map(s => s.CreatedOn)
+                .To(t => t.CreatedOn)
+                .Using(dto => dto.UtcDateTime);
         }
     }
 }

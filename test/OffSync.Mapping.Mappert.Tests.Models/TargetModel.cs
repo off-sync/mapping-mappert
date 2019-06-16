@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OffSync.Mapping.Mappert.Tests.Models
 {
@@ -13,6 +14,14 @@ namespace OffSync.Mapping.Mappert.Tests.Models
         public string Value1 { get; set; }
 
         public string Value2 { get; set; }
+
+        public string Value3 { get; set; }
+
+        public string MoreValue1 { get; set; }
+
+        public string MoreValue2 { get; set; }
+
+        public string MoreValue3 { get; set; }
 
         public bool Excluded { get; set; }
 
@@ -35,6 +44,12 @@ namespace OffSync.Mapping.Mappert.Tests.Models
         public IEnumerable<TargetNested> MoreItems { get; set; }
 
         public TargetNested NestedToo { get; set; }
+
+        public string IdAndName { get; set; }
+
+        public string Generated { get; set; }
+
+        public DateTime CreatedOn { get; set; }
     }
 
     public class TargetNested

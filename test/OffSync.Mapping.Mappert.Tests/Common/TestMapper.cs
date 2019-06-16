@@ -31,8 +31,12 @@ namespace OffSync.Mapping.Mappert.Tests.Common
                 .To(t => t.Description);
 
             Map(s => s.Values)
-                .To(t => t.Value1, t => t.Value2)
-                .Using(ValueSplitter);
+                .To(t => t.Value1, t => t.Value2, t => t.Value3)
+                .Using(ValueTupleSplitter);
+
+            Map(s => s.Values)
+                .To(t => t.MoreValue1, t => t.MoreValue2, t => t.MoreValue3)
+                .Using(ObjectArraySplitter);
 
             IgnoreSource(s => s.Ignored);
 
@@ -59,6 +63,31 @@ namespace OffSync.Mapping.Mappert.Tests.Common
 
             Map(s => s.Nested)
                 .To(t => t.NestedToo);
+
+            Map(s => s.Id, s => s.Name)
+                .To(t => t.IdAndName)
+                .Using(IdAndNameBuilder);
+
+            IgnoreTarget(t => t.Generated);
+
+            Map(s => s.CreatedOn)
+                .To(t => t.CreatedOn)
+                .Using(dto => dto.UtcDateTime);
+        }
+
+        protected override TargetModel CreateTarget()
+        {
+            return new TargetModel()
+            {
+                Generated = "generated",
+            };
+        }
+
+        private string IdAndNameBuilder(
+            int id,
+            string name)
+        {
+            return $"#{id} ({name})";
         }
 
         public TestMapper(
@@ -67,12 +96,18 @@ namespace OffSync.Mapping.Mappert.Tests.Common
         {
         }
 
-        private (string, string) ValueSplitter(
+        private (string, string, string) ValueTupleSplitter(
             string values)
         {
             var splittedValues = values.Split(',');
 
-            return (splittedValues[0], splittedValues[1]);
+            return (splittedValues[0], splittedValues[1], splittedValues[2]);
+        }
+
+        private object[] ObjectArraySplitter(
+            string values)
+        {
+            return values.Split(',');
         }
     }
 }

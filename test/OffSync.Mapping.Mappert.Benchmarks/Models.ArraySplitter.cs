@@ -4,7 +4,7 @@ namespace OffSync.Mapping.Mappert.Benchmarks
 {
     public class ArraySplitterSourceModel
     {
-        public string Values { get; set; } = "3,4";
+        public string Values { get; set; } = "1,2,3";
     }
 
     public class ArraySplitterTargetModel
@@ -12,6 +12,8 @@ namespace OffSync.Mapping.Mappert.Benchmarks
         public string Value1 { get; set; }
 
         public string Value2 { get; set; }
+
+        public string Value3 { get; set; }
     }
 
     public class ArraySplitterMapper :
@@ -23,16 +25,14 @@ namespace OffSync.Mapping.Mappert.Benchmarks
             WithMappingDelegateBuilder(mappingDelegateBuilder);
 
             Map(s => s.Values)
-                .To(t => t.Value1, t => t.Value2)
+                .To(t => t.Value1, t => t.Value2, t => t.Value3)
                 .Using(StringArraySplitter);
         }
 
         private object[] StringArraySplitter(
             string values)
         {
-            var splitted = values.Split(',');
-
-            return new object[] { splitted[0], splitted[1] };
+            return values.Split(',');
         }
     }
 }

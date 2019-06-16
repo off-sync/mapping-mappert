@@ -48,6 +48,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".azure-pipelines", ".azure-
 		.azure-pipelines\test-project-step-template.yml = .azure-pipelines\test-project-step-template.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OffSync.Mapping.Mappert.Benchmarks.Tests", "test\OffSync.Mapping.Mappert.Benchmarks.Tests\OffSync.Mapping.Mappert.Benchmarks.Tests.csproj", "{89340E56-841C-4F23-A7F3-A9C87A06D040}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +96,10 @@ Global
 		{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89340E56-841C-4F23-A7F3-A9C87A06D040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89340E56-841C-4F23-A7F3-A9C87A06D040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89340E56-841C-4F23-A7F3-A9C87A06D040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89340E56-841C-4F23-A7F3-A9C87A06D040}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +115,7 @@ Global
 		{04A5F444-C2C8-4B57-97C1-53843C647D06} = {1C6AD248-DD37-4165-BC4F-496E25E0AE4F}
 		{F35290D2-0126-4C3E-B5BB-E77D96D443FA} = {1C6AD248-DD37-4165-BC4F-496E25E0AE4F}
 		{E5CFDADB-0731-4E9F-AE53-A011BCE5DA9D} = {1C6AD248-DD37-4165-BC4F-496E25E0AE4F}
+		{89340E56-841C-4F23-A7F3-A9C87A06D040} = {1C6AD248-DD37-4165-BC4F-496E25E0AE4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {16CDB210-3587-4434-BB80-E271C75A3C81}

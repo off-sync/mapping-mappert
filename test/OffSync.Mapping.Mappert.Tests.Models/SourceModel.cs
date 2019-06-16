@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OffSync.Mapping.Mappert.Tests.Models
@@ -26,6 +27,8 @@ namespace OffSync.Mapping.Mappert.Tests.Models
         public SharedSub Shared { get; set; }
 
         public IOrderedEnumerable<SourceNested> MoreItems { get; set; }
+
+        public DateTimeOffset CreatedOn { get; set; }
     }
 
     public class SourceNested
